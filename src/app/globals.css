@@ -3,21 +3,325 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --gold: #d6cb72;
+  --gold-deep: #b8a94d;
+  --gold-soft: #f3efd0;
+  --black: #231f20;
+  --black-deep: #17151a;
+  --white: #fbfaed;
+  --gray: #6b6b66;
+  --success: #2e7d32;
+  --warning: #b45309;
+  --danger: #991b1b;
+
+  --background: #fbfaed;
+  --foreground: #231f20;
+  --card: #ffffff;
+  --card-foreground: #231f20;
+  --primary: #d6cb72;
+  --primary-foreground: #231f20;
+  --secondary: #f3efd0;
+  --secondary-foreground: #231f20;
+  --muted: #f0ece0;
+  --muted-foreground: #6b6b66;
+  --accent: #f3efd0;
+  --accent-foreground: #231f20;
+  --border: #e5dfc0;
+  --input: #ebe6d4;
+  --ring: #b8a94d;
+  --radius: 0.875rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    background-image:
+      radial-gradient(
+        ellipse 80% 50% at 50% -20%,
+        rgba(214, 203, 114, 0.15),
+        transparent
+      );
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display tracking-tight;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .container-app {
+    @apply mx-auto w-full max-w-5xl px-4 sm:px-6;
+  }
+
+  .container-wide {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6;
+  }
+
+  .page-main {
+    @apply container-app py-6 sm:py-10;
+  }
+
+  .safe-bottom {
+    padding-bottom: max(5rem, env(safe-area-inset-bottom));
+  }
+
+  .staff-shell {
+    min-height: 100vh;
+    background-color: #fbfaed;
+    color: #231f20;
+    background-image: radial-gradient(
+      ellipse 100% 60% at 50% -15%,
+      rgba(214, 203, 114, 0.18),
+      transparent 55%
+    );
+  }
+
+  .card-elevated {
+    @apply rounded-2xl border border-border bg-card shadow-card transition-shadow hover:shadow-soft;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  }
+
+  .badge-success {
+    @apply badge text-success;
+    background-color: rgba(46, 125, 50, 0.12);
+  }
+
+  .badge-warning {
+    @apply badge text-warning;
+    background-color: rgba(180, 83, 9, 0.12);
+  }
+
+  .badge-danger {
+    @apply badge text-danger;
+    background-color: rgba(153, 27, 27, 0.12);
+  }
+
+  .badge-muted {
+    @apply badge bg-muted text-muted-foreground;
+  }
+
+  .badge-gold {
+    @apply badge bg-gold-soft text-black;
+  }
+
+  .link-nav {
+    @apply text-sm font-medium text-muted-foreground transition-colors hover:text-foreground;
+  }
+
+  .link-nav-active {
+    @apply text-foreground;
+  }
+
+  /* Navigation admin / staff (fond sombre) */
+  .nav-admin-item {
+    @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors;
+    color: #f3efd0;
+  }
+
+  .nav-admin-item:hover {
+    background-color: rgba(214, 203, 114, 0.14);
+    color: #d6cb72;
+  }
+
+  .nav-admin-item-active {
+    background-color: #d6cb72;
+    color: #17151a;
+    font-weight: 600;
+    box-shadow: 0 2px 12px rgba(214, 203, 114, 0.35);
+  }
+
+  .nav-admin-item-active:hover {
+    background-color: #c4b865;
+    color: #17151a;
+  }
+
+  /* Navigation staff bas d'écran */
+  .nav-staff-item {
+    @apply text-muted-foreground;
+  }
+
+  .nav-staff-item-active {
+    @apply font-semibold text-gold-deep;
+  }
+
+  /* Page tableau de bord staff */
+  .staff-page-main {
+    @apply mx-auto max-w-2xl space-y-7 px-4 pb-6 pt-5;
+  }
+
+  .staff-hero {
+    @apply relative overflow-hidden rounded-2xl border bg-card p-5 shadow-card;
+    border-color: rgba(214, 203, 114, 0.35);
+    background-image: linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #fbf9ef 45%,
+      #f3efd0 100%
+    );
+  }
+
+  .staff-hero-glow {
+    @apply pointer-events-none absolute -right-6 -top-6 h-36 w-36 rounded-full opacity-60;
+    background: radial-gradient(
+      circle,
+      rgba(214, 203, 114, 0.45) 0%,
+      transparent 70%
+    );
+  }
+
+  .staff-cta-primary {
+    @apply flex items-center gap-4 rounded-xl p-4 transition-all active:scale-[0.98];
+    background: linear-gradient(135deg, #e8de7a 0%, #d6cb72 45%, #b8a94d 100%);
+    box-shadow:
+      0 4px 20px rgba(214, 203, 114, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+
+  .staff-cta-primary:hover {
+    filter: brightness(1.05);
+    box-shadow: 0 6px 28px rgba(214, 203, 114, 0.45);
+  }
+
+  .staff-pulse-dot {
+    @apply h-2.5 w-2.5 shrink-0 rounded-full bg-amber-400;
+    animation: staff-pulse 1.8s ease-in-out infinite;
+  }
+
+  @keyframes staff-pulse {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.5;
+      transform: scale(0.85);
+    }
+  }
+
+  .staff-stat-scroll {
+    @apply -mx-4 flex gap-2.5 overflow-x-auto px-4 pb-1;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .staff-stat-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .staff-stat-card {
+    @apply flex min-w-[8.5rem] shrink-0 snap-start items-center gap-3 rounded-xl border border-border bg-card px-3.5 py-3 shadow-sm;
+  }
+
+  .staff-stat-card-gold {
+    border-color: rgba(214, 203, 114, 0.4);
+    background-color: rgba(243, 239, 208, 0.6);
+  }
+
+  .staff-stat-card-warning {
+    border-color: rgba(180, 83, 9, 0.35);
+    background-color: rgba(180, 83, 9, 0.1);
+  }
+
+  .staff-stat-card-success {
+    border-color: rgba(22, 163, 74, 0.25);
+    background-color: rgba(46, 125, 50, 0.1);
+  }
+
+  .staff-links-compact {
+    @apply flex flex-wrap gap-2;
+  }
+
+  .staff-link-chip {
+    @apply inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-2 text-sm font-medium text-muted-foreground shadow-sm transition-colors hover:text-foreground;
+  }
+
+  .staff-link-chip:hover {
+    border-color: rgba(214, 203, 114, 0.5);
+    background-color: rgba(243, 239, 208, 0.8);
+  }
+
+  .staff-card {
+    @apply overflow-hidden rounded-2xl border border-border bg-card shadow-card;
+  }
+
+  /* Écran scan staff */
+  .scan-page {
+    @apply mx-auto flex min-h-[calc(100vh-8rem)] max-w-2xl flex-col pb-4;
+  }
+
+  .scan-camera-shell {
+    @apply relative mx-4 overflow-hidden rounded-2xl border-2 bg-black;
+    border-color: rgba(214, 203, 114, 0.45);
+    box-shadow: 0 8px 32px rgba(35, 31, 32, 0.12);
+  }
+
+  .scan-overlay {
+    @apply pointer-events-none absolute inset-0 flex items-center justify-center;
+  }
+
+  .scan-target {
+    @apply relative h-52 w-52 rounded-2xl;
+    box-shadow: inset 0 0 0 9999px rgba(0, 0, 0, 0.35);
+  }
+
+  .scan-corner {
+    @apply absolute h-10 w-10;
+    border-color: #d6cb72;
+  }
+
+  .scan-corner-tl {
+    @apply left-0 top-0 rounded-tl-xl border-l-4 border-t-4;
+  }
+
+  .scan-corner-tr {
+    @apply right-0 top-0 rounded-tr-xl border-r-4 border-t-4;
+  }
+
+  .scan-corner-bl {
+    @apply bottom-0 left-0 rounded-bl-xl border-b-4 border-l-4;
+  }
+
+  .scan-corner-br {
+    @apply bottom-0 right-0 rounded-br-xl border-b-4 border-r-4;
+  }
+
+  .scan-line {
+    @apply absolute left-6 right-6 h-0.5;
+    background-color: rgba(214, 203, 114, 0.85);
+    animation: scan-sweep 2.2s ease-in-out infinite;
+  }
+
+  @keyframes scan-sweep {
+    0%,
+    100% {
+      top: 18%;
+      opacity: 0.35;
+    }
+    50% {
+      top: 78%;
+      opacity: 1;
+    }
+  }
 }
 
 @layer utilities {

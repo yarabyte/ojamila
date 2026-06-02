@@ -1,0 +1,27 @@
+export class AppError extends Error {
+  constructor(
+    message: string,
+    public readonly code: string,
+    public readonly statusCode: number = 400
+  ) {
+    super(message);
+    this.name = "AppError";
+  }
+}
+
+export const ErrorCodes = {
+  FORMULA_NOT_FOUND: "FORMULA_NOT_FOUND",
+  FORMULA_INACTIVE: "FORMULA_INACTIVE",
+  HARD_CAP_REACHED: "HARD_CAP_REACHED",
+  CGU_NOT_ACCEPTED: "CGU_NOT_ACCEPTED",
+  SUBSCRIPTION_NOT_FOUND: "SUBSCRIPTION_NOT_FOUND",
+  INVALID_QR: "INVALID_QR",
+  NOT_ACTIVE: "NOT_ACTIVE",
+  EXPIRED: "EXPIRED",
+  NO_MEALS_LEFT: "NO_MEALS_LEFT",
+  DAILY_LIMIT_REACHED: "DAILY_LIMIT_REACHED",
+  DUPLICATE_SCAN: "DUPLICATE_SCAN",
+  UNAUTHORIZED: "UNAUTHORIZED",
+  WAITLIST_EMPTY: "WAITLIST_EMPTY",
+  INVALID_STATUS: "INVALID_STATUS",
+} as const;
