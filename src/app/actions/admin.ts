@@ -7,7 +7,6 @@ import { AppError } from "@/lib/errors";
 import {
   formulaService,
   formulaInputSchema,
-  isTestPeriodOver,
   resetPilotData,
   staffService,
   createStaffSchema,
