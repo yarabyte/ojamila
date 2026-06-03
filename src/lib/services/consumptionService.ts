@@ -211,6 +211,7 @@ export class ConsumptionService {
   ): Promise<ConsumeResult> {
     const subscriptionId = await this.resolveSubscriptionId(params);
     checkIdempotency(subscriptionId);
+    const settings = await getAppSettings();
 
     return prisma.$transaction(async (tx) => {
       const sub = await tx.subscription.findUnique({
@@ -251,7 +252,6 @@ export class ConsumptionService {
         throw new AppError("Solde épuisé", ErrorCodes.NO_MEALS_LEFT, 400);
       }
 
-      const settings = await getAppSettings();
       const dailyLimit =
         sub.formula.dailyMealLimit ?? settings.dailyMealLimitDefault;
       const todayStart = startOfDay(new Date());

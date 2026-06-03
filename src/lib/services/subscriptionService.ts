@@ -305,6 +305,8 @@ export class SubscriptionService {
   async activateAfterPayment(
     subscriptionId: string
   ): Promise<SubscriptionWithRelations> {
+    const settings = await getAppSettings();
+
     return prisma.$transaction(async (tx) => {
       const sub = await tx.subscription.findUnique({
         where: { id: subscriptionId },
@@ -344,7 +346,6 @@ export class SubscriptionService {
         );
       }
 
-      const settings = await getAppSettings();
       const validityDays =
         sub.formula.validityDays ?? settings.validityDaysDefault;
       const now = new Date();

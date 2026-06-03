@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/auth";
 import { AppError } from "@/lib/errors";
+import { formatActionError } from "@/lib/format-action-error";
 import {
   pushService,
   subscriptionService,
@@ -65,17 +66,8 @@ export async function activateSubscription(
     revalidatePath("/admin/subscriptions");
     return { success: true, data: undefined };
   } catch (e) {
-    if (e instanceof AppError) return { success: false, error: e.message };
-    if (e instanceof Error) {
-      if (e.message === "UNAUTHORIZED") {
-        return { success: false, error: "Session expirée — reconnectez-vous" };
-      }
-      if (e.message === "FORBIDDEN") {
-        return { success: false, error: "Accès non autorisé" };
-      }
-    }
     console.error("activateSubscription", e);
-    return { success: false, error: "Activation impossible" };
+    return { success: false, error: formatActionError(e, "Activation impossible") };
   }
 }
 
