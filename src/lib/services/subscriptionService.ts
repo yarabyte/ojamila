@@ -2,6 +2,7 @@ import {
   PaymentMethod,
   Prisma,
   SubscriptionStatus,
+  type AppSettings,
   type Formula,
   type Subscription,
   type User,
@@ -145,9 +146,9 @@ export class SubscriptionService {
       cguVersion: string;
       waitlistPosition?: number;
       activateNow?: boolean;
-    }
+    },
+    settings: AppSettings
   ): Promise<Subscription> {
-    const settings = await getAppSettings();
     const totalMeals = totalMealsForFormula(params.formula);
     const shortCode = await uniqueShortCode(tx);
 
@@ -223,13 +224,17 @@ export class SubscriptionService {
         waitlistPosition = await nextWaitlistPosition(formula.id, tx);
       }
 
-      const subscription = await this.createSubscriptionRecord(tx, {
-        clientId: client.id,
-        formula,
-        status,
-        cguVersion: settings.cguVersion,
-        waitlistPosition,
-      });
+      const subscription = await this.createSubscriptionRecord(
+        tx,
+        {
+          clientId: client.id,
+          formula,
+          status,
+          cguVersion: settings.cguVersion,
+          waitlistPosition,
+        },
+        settings
+      );
 
       return tx.subscription.findUniqueOrThrow({
         where: { id: subscription.id },
@@ -277,14 +282,18 @@ export class SubscriptionService {
         activateNow = false;
       }
 
-      const subscription = await this.createSubscriptionRecord(tx, {
-        clientId: client.id,
-        formula,
-        status,
-        cguVersion: settings.cguVersion,
-        waitlistPosition,
-        activateNow,
-      });
+      const subscription = await this.createSubscriptionRecord(
+        tx,
+        {
+          clientId: client.id,
+          formula,
+          status,
+          cguVersion: settings.cguVersion,
+          waitlistPosition,
+          activateNow,
+        },
+        settings
+      );
 
       return tx.subscription.findUniqueOrThrow({
         where: { id: subscription.id },

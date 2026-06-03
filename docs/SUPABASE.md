@@ -77,3 +77,4 @@ Sinon, un simple `db:deploy` + `db:seed` sur une base Supabase vide suffit.
 | `prepared statement already exists` | Ajouter `?pgbouncer=true` à `DATABASE_URL` |
 | `Unknown argument` Prisma | `npx prisma generate` puis redémarrer le serveur |
 | Trop de connexions sur Vercel | Utiliser le pooler (`6543`), pas le port direct pour `DATABASE_URL` |
+| `Erreur lors de la souscription` en local | Ne pas utiliser le pooler `6543` + `connection_limit=1` en dev : mettre `DATABASE_URL` = `DIRECT_URL` (port `5432`). Garder `6543` uniquement sur Vercel. |

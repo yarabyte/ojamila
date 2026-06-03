@@ -65,6 +65,20 @@ export async function subscribeSelfService(
   } catch (e) {
     if (e instanceof AppError) return { success: false, error: e.message };
     console.error(e);
+    const msg = e instanceof Error ? e.message : "";
+    if (msg.includes("connection pool")) {
+      return {
+        success: false,
+        error:
+          "Connexion base saturée. En local, mettez DATABASE_URL sur le pooler port 5432 (comme DIRECT_URL), pas le port 6543 avec connection_limit=1.",
+      };
+    }
+    if (msg.includes("JWT_QR_SECRET")) {
+      return {
+        success: false,
+        error: "JWT_QR_SECRET manquant dans .env",
+      };
+    }
     return { success: false, error: "Erreur lors de la souscription" };
   }
 }
