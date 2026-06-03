@@ -7,10 +7,11 @@ PWA de prévente d'abonnements repas pour **O'JAMILA** (Bonapriso, Douala).
 ```bash
 npm install
 cp .env.example .env
-# DATABASE_URL, NEXTAUTH_SECRET, JWT_QR_SECRET, NEXT_PUBLIC_APP_URL
+# DATABASE_URL, DIRECT_URL (Supabase ou local), NEXTAUTH_SECRET, JWT_QR_SECRET, NEXT_PUBLIC_APP_URL
 
-npx prisma migrate dev
-npx prisma db seed
+# Supabase : voir docs/SUPABASE.md
+npm run db:verify && npm run db:setup
+
 npm run dev
 ```
 
@@ -53,15 +54,40 @@ npm run dev
 
 > Les navigateurs exigent une action utilisateur pour l'installation (tap sur le bouton). L'app s'affiche ensuite en plein écran avec l'icône Ô JAMILA sur l'écran d'accueil.
 
+## Base Supabase (au lieu de Postgres local)
+
+Guide détaillé : **[docs/SUPABASE.md](docs/SUPABASE.md)**
+
+1. Créer un projet sur [supabase.com](https://supabase.com) (plan gratuit suffit).
+2. **Project Settings → Database** :
+   - Noter le mot de passe `postgres` (ou le réinitialiser).
+   - **Connection string → URI** :
+     - **Transaction pooler** (port `6543`) → `DATABASE_URL` (ajouter `?pgbouncer=true&connection_limit=1` si absent).
+     - **Session pooler** ou **Direct** (port `5432`) → `DIRECT_URL`.
+3. Dans `.env` (local) et sur **Vercel → Environment Variables** (Production) :
+   ```env
+   DATABASE_URL="postgresql://postgres.[ref]:[MOT_DE_PASSE]@aws-0-eu-central-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
+   DIRECT_URL="postgresql://postgres.[ref]:[MOT_DE_PASSE]@aws-0-eu-central-1.pooler.supabase.com:5432/postgres"
+   ```
+4. Appliquer le schéma et les données initiales :
+   ```bash
+   npm run db:verify
+   npm run db:setup
+   ```
+5. Vérifier dans Supabase **Table Editor** : tables `User`, `Formula`, `Subscription`, etc.
+6. Redéployer sur Vercel si vous venez d’ajouter les variables.
+
+> **Migrations** : `prisma migrate deploy` utilise `DIRECT_URL`. L’app en prod utilise `DATABASE_URL` (pooler) pour éviter d’épuiser les connexions sur Vercel.
+
 ## Déploiement Vercel (`ojamila.vercel.app`)
 
 1. Importer le repo sur [Vercel](https://vercel.com)
 2. Variables d'environnement :
-   - `DATABASE_URL` — Postgres (Supabase, Neon, etc.)
+   - `DATABASE_URL` + `DIRECT_URL` — Supabase (voir section ci-dessus)
    - `NEXTAUTH_URL` = `https://ojamila.vercel.app`
    - `NEXTAUTH_SECRET`, `JWT_QR_SECRET`
    - `NEXT_PUBLIC_APP_URL` = `https://ojamila.vercel.app`
-3. Après le premier déploiement :
+3. Migrations + seed (avec les URLs Supabase dans `.env` ou en ligne de commande) :
    ```bash
    npx prisma migrate deploy
    npx prisma db seed
