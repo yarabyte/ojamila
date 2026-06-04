@@ -73,7 +73,7 @@ export async function activateSubscription(
 
 export async function promoteWaitlist(
   subscriptionId: string
-): Promise<ActionResult<{ whatsappUrl?: string }>> {
+): Promise<ActionResult<{ whatsappUrl?: string; autoSent?: boolean }>> {
   try {
     await requireRole(["STAFF", "ADMIN"]);
     const sub = await subscriptionService.promoteFromWaitlist(subscriptionId);
@@ -84,15 +84,21 @@ export async function promoteWaitlist(
       url: `${base}/subscribe/confirmation/${sub.id}`,
     });
     const qrLink = getSubscriptionQrUrl(sub.id);
-    const whatsappUrl = await whatsappService.getShareLink(sub.client.phone, {
+    const message = await whatsappService.buildMessage({
       name: sub.client.name,
       qrLink,
       formulaName: sub.formula.name,
       shortCode: sub.shortCode,
     });
+    const delivery = await whatsappService.sendMessage(sub.client.phone, message);
     revalidatePath("/staff/waitlist");
     revalidatePath("/admin/waitlist");
-    return { success: true, data: { whatsappUrl } };
+    return {
+      success: true,
+      data: delivery.sent
+        ? { autoSent: true }
+        : { whatsappUrl: delivery.link },
+    };
   } catch (e) {
     if (e instanceof AppError) return { success: false, error: e.message };
     return { success: false, error: "Promotion impossible" };

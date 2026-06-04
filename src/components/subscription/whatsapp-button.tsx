@@ -5,6 +5,7 @@ import {
   getWhatsAppLinkForSubscription,
   getWhatsAppQrSharePayload,
   sendWhatsAppQrImage,
+  sendWhatsAppTextForSubscription,
 } from "@/app/actions/subscription";
 import { Button } from "@/components/ui/button";
 import {
@@ -46,9 +47,14 @@ export function WhatsAppButton({
       if (cloudApiConfigured) {
         const apiResult = await sendWhatsAppQrImage(subscriptionId);
         if (apiResult.success) {
-          setHint("QR envoyé sur WhatsApp du client.");
+          setHint(
+            apiResult.data.textOnly
+              ? "Message WhatsApp envoyé (lien QR — image disponible en production)."
+              : "QR envoyé sur WhatsApp du client."
+          );
           return;
         }
+        setError(apiResult.error);
       }
 
       const file = dataUrlToFile(dataUrl, filename);
@@ -75,12 +81,18 @@ export function WhatsAppButton({
     setLoading(true);
     setHint(null);
     setError(null);
-    const result = await getWhatsAppLinkForSubscription(subscriptionId);
+    const result = await sendWhatsAppTextForSubscription(subscriptionId);
     setLoading(false);
-    if (result.success) {
-      window.open(result.data.url, "_blank");
-    } else {
+    if (!result.success) {
       setError(result.error);
+      return;
+    }
+    if (result.data.autoSent) {
+      setHint("Message WhatsApp envoyé au client.");
+      return;
+    }
+    if (result.data.url) {
+      window.open(result.data.url, "_blank");
     }
   }
 

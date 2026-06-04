@@ -101,6 +101,35 @@ async function getActiveSubscriptionForQr(
   return { ok: true, sub };
 }
 
+export async function sendWhatsAppTextForSubscription(
+  subscriptionId: string
+): Promise<ActionResult<{ autoSent: boolean; url?: string; provider?: string }>> {
+  try {
+    const active = await getActiveSubscriptionForQr(subscriptionId);
+    if (!active.ok) return { success: false, error: active.error };
+    const { sub } = active;
+
+    const qrLink = getSubscriptionQrUrl(sub.id);
+    const message = await whatsappService.buildMessage({
+      name: sub.client.name,
+      qrLink,
+      formulaName: sub.formula.name,
+      shortCode: sub.shortCode,
+    });
+    const delivery = await whatsappService.sendMessage(sub.client.phone, message);
+    if (delivery.sent) {
+      return {
+        success: true,
+        data: { autoSent: true, provider: delivery.provider },
+      };
+    }
+    return { success: true, data: { autoSent: false, url: delivery.link } };
+  } catch (e) {
+    console.error(e);
+    return { success: false, error: "Impossible d'envoyer le message" };
+  }
+}
+
 export async function getWhatsAppLinkForSubscription(
   subscriptionId: string
 ): Promise<ActionResult<{ url: string }>> {
@@ -164,10 +193,10 @@ export async function getWhatsAppQrSharePayload(
   }
 }
 
-/** Envoi automatique du QR en image si l'API WhatsApp Cloud est configurée */
+/** Envoi automatique du QR via API (image en prod, texte en local Twilio) */
 export async function sendWhatsAppQrImage(
   subscriptionId: string
-): Promise<ActionResult<{ method: "api" }>> {
+): Promise<ActionResult<{ method: "api"; textOnly?: boolean }>> {
   try {
     const active = await getActiveSubscriptionForQr(subscriptionId);
     if (!active.ok) return { success: false, error: active.error };
@@ -191,13 +220,18 @@ export async function sendWhatsAppQrImage(
     const result = await whatsappService.sendImageMessage(
       sub.client.phone,
       png,
-      caption
+      caption,
+      { subscriptionId: sub.id }
     );
 
     if (!result.sent) {
       return { success: false, error: result.error };
     }
-    return { success: true, data: { method: "api" } };
+    const textOnly =
+      whatsappService.getProviderName() === "twilio" &&
+      !process.env.NEXT_PUBLIC_APP_URL?.includes("vercel.app") &&
+      !process.env.NEXT_PUBLIC_APP_URL?.startsWith("https://");
+    return { success: true, data: { method: "api", textOnly } };
   } catch (e) {
     console.error(e);
     return { success: false, error: "Échec de l'envoi WhatsApp" };

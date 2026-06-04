@@ -22,6 +22,8 @@ export function WaitlistActions({
     setLoading(false);
     if (result.success && result.data.whatsappUrl) {
       window.open(result.data.whatsappUrl, "_blank");
+    } else if (result.success && result.data.autoSent) {
+      alert("Notification WhatsApp envoyée au client.");
     }
     router.refresh();
   }

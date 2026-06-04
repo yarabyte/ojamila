@@ -16,12 +16,14 @@ export function ClientLoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [devCode, setDevCode] = useState<string | null>(null);
+  const [autoSent, setAutoSent] = useState(false);
 
   async function requestCode(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
     setDevCode(null);
+    setAutoSent(false);
     try {
       const res = await fetch("/api/client/otp/request", {
         method: "POST",
@@ -34,7 +36,9 @@ export function ClientLoginForm() {
         return;
       }
       if (data.devCode) setDevCode(data.devCode);
-      if (data.whatsappUrl) {
+      if (data.autoSent) {
+        setAutoSent(true);
+      } else if (data.whatsappUrl) {
         window.open(data.whatsappUrl, "_blank");
       }
       setStep("code");
@@ -68,7 +72,9 @@ export function ClientLoginForm() {
     return (
       <form onSubmit={verifyCode} className="space-y-4">
         <p className="text-sm text-muted-foreground">
-          Un code à 6 chiffres a été envoyé sur WhatsApp au{" "}
+          {autoSent
+            ? "Un code à 6 chiffres vient d'être envoyé sur WhatsApp au "
+            : "Un code à 6 chiffres a été envoyé sur WhatsApp au "}
           <strong>{phone}</strong>.
         </p>
         {devCode && (

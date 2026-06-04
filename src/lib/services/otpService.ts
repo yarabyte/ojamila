@@ -17,7 +17,8 @@ function generateOtpCode(): string {
 
 export class OtpService {
   async requestLoginOtp(phone: string): Promise<{
-    whatsappUrl: string;
+    whatsappUrl?: string;
+    autoSent?: boolean;
     /** Uniquement en développement pour tests sans WhatsApp */
     devCode?: string;
   }> {
@@ -56,11 +57,12 @@ export class OtpService {
 
     lastRequestByPhone.set(normalized, Date.now());
 
-    const message = `Votre code de connexion JAMILA : ${code}. Valide 10 minutes. Ne le partagez pas.`;
-    const whatsappUrl = whatsappService.buildWaMeLink(normalized, message);
+    const delivery = await whatsappService.sendOtpCode(normalized, code);
 
     return {
-      whatsappUrl,
+      ...(delivery.sent
+        ? { autoSent: true }
+        : { whatsappUrl: delivery.link }),
       ...(process.env.NODE_ENV === "development" ? { devCode: code } : {}),
     };
   }

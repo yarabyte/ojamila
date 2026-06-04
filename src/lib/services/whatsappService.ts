@@ -1,17 +1,11 @@
 import { phoneToWhatsAppDigits } from "@/lib/phone";
 import { getAppSettings } from "@/lib/settings";
-
-const GRAPH_API = "https://graph.facebook.com/v21.0";
-
-function getCloudApiConfig(): {
-  accessToken: string;
-  phoneNumberId: string;
-} | null {
-  const accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
-  const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
-  if (!accessToken || !phoneNumberId) return null;
-  return { accessToken, phoneNumberId };
-}
+import {
+  getActiveWhatsAppProvider,
+  getWhatsAppProviderLabel,
+} from "./whatsapp/providers/get-provider";
+import type { WhatsAppTemplateComponent } from "./whatsapp/providers/types";
+import { buildPublicQrMediaUrl, isTwilioReachableMediaUrl } from "./whatsapp/qr-media-url";
 
 export type WhatsAppMessageContext = {
   name: string;
@@ -20,10 +14,12 @@ export type WhatsAppMessageContext = {
   shortCode?: string;
 };
 
-/**
- * Abstraction WhatsApp — MVP via lien wa.me.
- * Prêt à brancher WhatsApp Business API / Twilio.
- */
+export type SendMessageResult =
+  | { sent: true; method: "api"; provider?: string }
+  | { sent: false; method: "wa.me"; link: string };
+
+export type { WhatsAppTemplateComponent };
+
 export class WhatsAppService {
   private applyTemplate(
     template: string,
@@ -56,89 +52,112 @@ export class WhatsAppService {
   }
 
   isCloudApiConfigured(): boolean {
-    return getCloudApiConfig() !== null;
+    return getActiveWhatsAppProvider() !== null;
   }
 
-  /**
-   * Envoi d'une image (QR) via WhatsApp Cloud API.
-   * Nécessite WHATSAPP_ACCESS_TOKEN + WHATSAPP_PHONE_NUMBER_ID.
-   */
+  getProviderName(): string | null {
+    return getWhatsAppProviderLabel();
+  }
+
+  async sendTemplateMessage(
+    phone: string,
+    template: {
+      name: string;
+      language: string;
+      components?: WhatsAppTemplateComponent[];
+    }
+  ): Promise<{ sent: true } | { sent: false; error: string }> {
+    const provider = getActiveWhatsAppProvider();
+    if (!provider) {
+      return { sent: false, error: "Aucun fournisseur WhatsApp configuré" };
+    }
+    return provider.sendTemplate(phone, template);
+  }
+
+  async sendTextMessage(
+    phone: string,
+    text: string
+  ): Promise<{ sent: true } | { sent: false; error: string }> {
+    const provider = getActiveWhatsAppProvider();
+    if (!provider) {
+      return { sent: false, error: "Aucun fournisseur WhatsApp configuré" };
+    }
+    return provider.sendText(phone, text);
+  }
+
+  async sendOtpCode(
+    phone: string,
+    code: string
+  ): Promise<SendMessageResult & { error?: string }> {
+    const message = `Votre code de connexion JAMILA : ${code}. Valide 10 minutes. Ne le partagez pas.`;
+    const provider = getActiveWhatsAppProvider();
+    const templateName = process.env.WHATSAPP_OTP_TEMPLATE_NAME;
+
+    if (provider && templateName && provider.name === "meta") {
+      const result = await provider.sendTemplate(phone, {
+        name: templateName,
+        language: process.env.WHATSAPP_OTP_TEMPLATE_LANGUAGE ?? "fr",
+        components: [
+          { type: "body", parameters: [{ type: "text", text: code }] },
+        ],
+      });
+      if (result.sent) {
+        return { sent: true, method: "api", provider: provider.name };
+      }
+      console.warn("WhatsApp OTP template failed:", result.error);
+    }
+
+    if (provider) {
+      const result = await provider.sendText(phone, message);
+      if (result.sent) {
+        return { sent: true, method: "api", provider: provider.name };
+      }
+      console.warn(`WhatsApp OTP (${provider.name}) failed:`, result.error);
+    }
+
+    return {
+      sent: false,
+      method: "wa.me",
+      link: this.buildWaMeLink(phone, message),
+    };
+  }
+
   async sendImageMessage(
     phone: string,
     imagePng: Buffer,
-    caption: string
+    caption: string,
+    options?: { subscriptionId?: string }
   ): Promise<{ sent: true } | { sent: false; error: string }> {
-    const config = getCloudApiConfig();
-    if (!config) {
-      return { sent: false, error: "API WhatsApp non configurée" };
+    const provider = getActiveWhatsAppProvider();
+    if (!provider) {
+      return { sent: false, error: "Aucun fournisseur WhatsApp configuré" };
     }
 
-    const to = phoneToWhatsAppDigits(phone);
-    const { accessToken, phoneNumberId } = config;
-
-    const form = new FormData();
-    form.append(
-      "file",
-      new Blob([Uint8Array.from(imagePng)], { type: "image/png" }),
-      "jamila-qr.png"
-    );
-    form.append("type", "image/png");
-    form.append("messaging_product", "whatsapp");
-
-    const uploadRes = await fetch(
-      `${GRAPH_API}/${phoneNumberId}/media`,
-      {
-        method: "POST",
-        headers: { Authorization: `Bearer ${accessToken}` },
-        body: form,
+    let mediaUrl: string | undefined;
+    if (provider.name === "twilio" && options?.subscriptionId) {
+      try {
+        const url = buildPublicQrMediaUrl(options.subscriptionId);
+        if (isTwilioReachableMediaUrl(url)) {
+          mediaUrl = url;
+        }
+      } catch (e) {
+        console.error("QR media URL:", e);
       }
-    );
-
-    if (!uploadRes.ok) {
-      const err = await uploadRes.text();
-      console.error("WhatsApp media upload:", err);
-      return { sent: false, error: "Échec envoi image (upload)" };
     }
 
-    const { id: mediaId } = (await uploadRes.json()) as { id?: string };
-    if (!mediaId) {
-      return { sent: false, error: "Échec envoi image (media id)" };
-    }
-
-    const messageRes = await fetch(
-      `${GRAPH_API}/${phoneNumberId}/messages`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          messaging_product: "whatsapp",
-          recipient_type: "individual",
-          to,
-          type: "image",
-          image: { id: mediaId, caption: caption.slice(0, 1024) },
-        }),
-      }
-    );
-
-    if (!messageRes.ok) {
-      const err = await messageRes.text();
-      console.error("WhatsApp send image:", err);
-      return { sent: false, error: "Échec envoi image (message)" };
-    }
-
-    return { sent: true };
+    return provider.sendImage(phone, imagePng, caption, { mediaUrl });
   }
 
-  /**
-   * Envoi texte via API — fallback wa.me si non configuré.
-   */
-  async sendMessage(
-    phone: string,
-    message: string
-  ): Promise<{ sent: false; method: "wa.me"; link: string }> {
+  async sendMessage(phone: string, message: string): Promise<SendMessageResult> {
+    const provider = getActiveWhatsAppProvider();
+    if (provider) {
+      const result = await provider.sendText(phone, message);
+      if (result.sent) {
+        return { sent: true, method: "api", provider: provider.name };
+      }
+      console.warn(`WhatsApp (${provider.name}) failed, fallback wa.me:`, result.error);
+    }
+
     return {
       sent: false,
       method: "wa.me",
