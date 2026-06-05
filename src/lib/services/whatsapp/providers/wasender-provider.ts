@@ -88,7 +88,7 @@ export const wasenderWhatsAppProvider: WhatsAppProvider = {
         ? template.components[0].parameters[0].text
         : undefined;
     const text = code
-      ? `Votre code Ô JAMILA : ${code}. Valide 10 minutes. Ne le partagez pas.`
+      ? `Code de connexion JAMILA\n\n${code}\n\nValide 10 minutes. Ne le partagez pas.`
       : `Message JAMILA : ${template.name}`;
     return sendWasenderMessage({ to: toE164(phone), text });
   },

@@ -89,7 +89,7 @@ export class WhatsAppService {
     phone: string,
     code: string
   ): Promise<SendMessageResult & { error?: string }> {
-    const message = `Votre code de connexion JAMILA : ${code}. Valide 10 minutes. Ne le partagez pas.`;
+    const message = `Code de connexion JAMILA\n\n${code}\n\nValide 10 minutes. Ne le partagez pas.`;
     const provider = getActiveWhatsAppProvider();
     const templateName = process.env.WHATSAPP_OTP_TEMPLATE_NAME;
 

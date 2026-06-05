@@ -11,32 +11,41 @@ const publicLinks = [
   { href: "/cgu", label: "CGU" },
 ];
 
+function isLinkActive(href: string, activePath?: string): boolean {
+  if (!activePath) return false;
+  if (href === "/") return activePath === "/";
+  return activePath === href || activePath.startsWith(`${href}/`);
+}
+
 export async function SiteHeader({
   activePath,
+  /** Masque la barre d'onglets mobile (zone client avec nav basse) */
+  compactMobile = false,
 }: {
   activePath?: string;
+  compactMobile?: boolean;
 }) {
   const session = await getServerAuthSession();
   const staffHref =
     session?.user.role === "ADMIN" ? "/admin" : "/staff";
 
   return (
-    <header className="sticky top-0 z-50 border-b border-gold/20 bg-black-deep/95 text-white backdrop-blur-md">
-      <div className="container-app flex h-16 items-center justify-between gap-4">
-        <Link href="/" className="flex shrink-0 items-center gap-3">
+    <header className="sticky top-0 z-50 border-b border-gold/30 bg-black-deep text-white shadow-[0_4px_24px_rgba(0,0,0,0.35)]">
+      <div className="container-app flex h-14 items-center justify-between gap-3 sm:h-16">
+        <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2.5 sm:gap-3">
           <Image
             src="/logo.svg"
             alt={VENUE_NAME}
-            width={44}
-            height={44}
-            className="rounded-full ring-1 ring-gold/40"
+            width={40}
+            height={40}
+            className="rounded-full ring-1 ring-gold/50 sm:h-11 sm:w-11"
             priority
           />
-          <div className="hidden sm:block">
-            <p className="font-display text-lg font-semibold leading-tight text-gold">
+          <div className={cn(compactMobile ? "block min-w-0" : "hidden sm:block")}>
+            <p className="truncate font-display text-base font-semibold leading-tight text-gold sm:text-lg">
               {VENUE_NAME}
             </p>
-            <p className="text-[11px] text-white/60">
+            <p className="truncate text-[10px] text-white/75 sm:text-[11px]">
               {VENUE_ADDRESS.city} · Abonnements repas
             </p>
           </div>
@@ -48,8 +57,8 @@ export async function SiteHeader({
               key={href}
               href={href}
               className={cn(
-                "text-sm font-medium text-gold-soft transition-colors hover:text-gold",
-                activePath === href && "text-gold"
+                "text-sm font-semibold text-white/85 transition-colors hover:text-gold",
+                isLinkActive(href, activePath) && "text-gold"
               )}
             >
               {label}
@@ -57,17 +66,17 @@ export async function SiteHeader({
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <Link
             href={staffHref}
-            className="hidden rounded-lg border border-gold/40 px-3 py-2 text-xs font-semibold text-gold transition-colors hover:bg-gold/10 sm:inline-flex"
+            className="hidden rounded-lg border border-gold/50 px-3 py-2 text-xs font-semibold text-gold transition-colors hover:bg-gold/15 sm:inline-flex"
           >
             {session ? "Tableau de bord" : "Caisse"}
           </Link>
           {!session && (
             <Link
               href="/login"
-              className="rounded-lg bg-gold px-3 py-2 text-xs font-semibold text-black transition-colors hover:bg-gold-deep"
+              className="rounded-lg bg-gold px-3 py-2 text-xs font-bold text-black transition-colors hover:bg-gold-deep"
             >
               Connexion
             </Link>
@@ -75,26 +84,36 @@ export async function SiteHeader({
         </div>
       </div>
 
-      <nav className="flex gap-1 overflow-x-auto border-t border-white/5 px-4 py-2 md:hidden">
-        {publicLinks.map(({ href, label }) => (
-          <Link
-            key={href}
-            href={href}
-            className={cn(
-              "shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium text-gold-soft",
-              activePath === href && "bg-gold/20 text-gold"
-            )}
-          >
-            {label}
-          </Link>
-        ))}
-        <Link
-          href={staffHref}
-          className="shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium text-gold"
+      {!compactMobile && (
+        <nav
+          className="flex gap-1.5 overflow-x-auto border-t border-white/10 bg-black-deep px-3 py-2.5 md:hidden"
+          aria-label="Navigation principale"
         >
-          Caisse
-        </Link>
-      </nav>
+          {publicLinks.map(({ href, label }) => {
+            const active = isLinkActive(href, activePath);
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={cn(
+                  "shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors",
+                  active
+                    ? "bg-gold text-black shadow-sm"
+                    : "bg-white/10 text-white hover:bg-white/15"
+                )}
+              >
+                {label}
+              </Link>
+            );
+          })}
+          <Link
+            href={staffHref}
+            className="shrink-0 rounded-full border border-gold/50 bg-transparent px-4 py-2 text-sm font-semibold text-gold"
+          >
+            Caisse
+          </Link>
+        </nav>
+      )}
     </header>
   );
 }

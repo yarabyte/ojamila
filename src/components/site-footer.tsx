@@ -1,10 +1,16 @@
 import Link from "next/link";
 import { VenueContactBlock, VenueServicesList } from "@/components/venue-info";
 import { VENUE_BUFFET_NOTE, VENUE_NAME } from "@/lib/venue";
+import { cn } from "@/lib/utils";
 
-export function SiteFooter() {
+export function SiteFooter({ className }: { className?: string }) {
   return (
-    <footer className="mt-auto border-t border-gold/20 bg-black-deep text-white">
+    <footer
+      className={cn(
+        "mt-auto border-t border-gold/20 bg-black-deep text-white",
+        className
+      )}
+    >
       <div className="container-app py-10 sm:py-12">
         <div className="grid gap-10 lg:grid-cols-[1.2fr_1fr] lg:gap-12">
           <div>

@@ -16,10 +16,10 @@ export function ClientNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 border-t border-gold/25 bg-black-deep/95 pb-[env(safe-area-inset-bottom)] text-white backdrop-blur-md"
+      className="fixed bottom-0 left-0 right-0 z-50 border-t border-gold/30 bg-black-deep pb-[env(safe-area-inset-bottom)] text-white shadow-[0_-6px_28px_rgba(0,0,0,0.45)]"
       aria-label="Navigation client"
     >
-      <div className="mx-auto flex max-w-lg items-stretch justify-around px-1 pt-1">
+      <div className="mx-auto flex max-w-lg items-stretch justify-around px-2 pt-1">
         {links.map(({ href, label, icon: Icon, exact }) => {
           const active =
             href === "/client/qr"
@@ -34,14 +34,21 @@ export function ClientNav() {
               key={href}
               href={href}
               className={cn(
-                "relative flex min-h-[60px] min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-t-xl px-1 py-2 text-[11px] font-semibold transition-colors",
-                active ? "text-gold" : "text-white/65"
+                "relative flex min-h-[62px] min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-t-xl px-1 py-2 text-xs font-bold transition-colors sm:text-[13px]",
+                active ? "text-gold" : "text-white/80"
               )}
             >
               {active && (
-                <span className="absolute inset-x-3 top-0 h-0.5 rounded-full bg-gold" />
+                <span className="absolute inset-x-4 top-0 h-1 rounded-full bg-gold" />
               )}
-              <Icon className={cn("h-6 w-6", active && "text-gold")} />
+              <span
+                className={cn(
+                  "flex h-9 w-9 items-center justify-center rounded-xl transition-colors",
+                  active ? "bg-gold/20" : "bg-white/5"
+                )}
+              >
+                <Icon className={cn("h-5 w-5", active && "text-gold")} />
+              </span>
               <span>{label}</span>
             </Link>
           );
