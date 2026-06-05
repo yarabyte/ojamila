@@ -1,12 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createMealGift } from "@/app/actions/gift";
 import { ActionOverlay } from "@/components/ui/loading-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Gift } from "lucide-react";
+import {
+  isContactPickerSupported,
+  pickPhoneFromContacts,
+} from "@/lib/contact-picker";
+import { Contact, Gift } from "lucide-react";
 
 export function GiftMealForm({
   subscriptionId,
@@ -17,12 +21,31 @@ export function GiftMealForm({
 }) {
   const [recipientPhone, setRecipientPhone] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pickingContact, setPickingContact] = useState(false);
+  const [contactsAvailable, setContactsAvailable] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<{
     shortCode: string;
     autoSent: boolean;
     waMeUrl?: string;
   } | null>(null);
+
+  useEffect(() => {
+    setContactsAvailable(isContactPickerSupported());
+  }, []);
+
+  async function pickContact() {
+    setPickingContact(true);
+    setError(null);
+    try {
+      const phone = await pickPhoneFromContacts();
+      if (phone) setRecipientPhone(phone);
+    } catch {
+      setError("Impossible d'ouvrir les contacts de votre téléphone.");
+    } finally {
+      setPickingContact(false);
+    }
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -102,16 +125,38 @@ export function GiftMealForm({
           </p>
           <div className="space-y-2">
             <Label htmlFor="gift-phone">WhatsApp du destinataire</Label>
-            <Input
-              id="gift-phone"
-              name="recipientPhone"
-              type="tel"
-              required
-              placeholder="6XX XXX XXX"
-              value={recipientPhone}
-              onChange={(e) => setRecipientPhone(e.target.value)}
-              autoComplete="tel"
-            />
+            <div className="flex gap-2">
+              <Input
+                id="gift-phone"
+                name="recipientPhone"
+                type="tel"
+                inputMode="tel"
+                required
+                placeholder="6XX XXX XXX"
+                value={recipientPhone}
+                onChange={(e) => setRecipientPhone(e.target.value)}
+                autoComplete="tel"
+                className="flex-1"
+              />
+              {contactsAvailable && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="shrink-0 gap-1.5 px-3"
+                  onClick={pickContact}
+                  disabled={loading || pickingContact}
+                  aria-label="Choisir dans les contacts"
+                >
+                  <Contact className="h-4 w-4" />
+                  <span className="sr-only sm:not-sr-only">Contacts</span>
+                </Button>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {contactsAvailable
+                ? "Choisissez un contact ou saisissez le numéro WhatsApp."
+                : "Saisissez le numéro WhatsApp (sur iPhone, collez depuis vos contacts si besoin)."}
+            </p>
           </div>
           {error && (
             <p className="text-sm text-danger" role="alert">
