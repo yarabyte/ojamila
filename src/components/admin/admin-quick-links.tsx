@@ -5,6 +5,7 @@ import {
   Camera,
   ClipboardList,
   CreditCard,
+  Heart,
   Home,
   LayoutDashboard,
   List,
@@ -57,6 +58,12 @@ export async function AdminQuickLinks() {
       label: "Comptes staff",
       description: "Créer ou désactiver",
       icon: Users,
+    },
+    {
+      href: "/admin/thank-you",
+      label: "Remerciements",
+      description: "Message + photos Drive par WhatsApp",
+      icon: Heart,
     },
     {
       href: "/admin/settings",

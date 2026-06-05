@@ -12,6 +12,7 @@ import {
   CreditCard,
   List,
   ScanLine,
+  Heart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +27,7 @@ const links = [
     match: "pending" as const,
   },
   { href: "/admin/waitlist", label: "Liste d'attente", icon: ClipboardList },
+  { href: "/admin/thank-you", label: "Remerciements", icon: Heart },
   { href: "/admin/staff", label: "Staff", icon: Users },
   { href: "/admin/settings", label: "Paramètres", icon: Settings },
 ];

@@ -15,3 +15,16 @@ export {
   resetPilotData,
   isTestPeriodOver,
 } from "./resetService";
+export {
+  buildThankYouMessage,
+  buildThankYouPreviewMessage,
+  getThankYouSubscriptionCount,
+  sendThankYouBatch,
+  recordThankYouCampaign,
+  getFirstSubscriptionSample,
+} from "./thankYouService";
+export type {
+  ThankYouBatchResult,
+  ThankYouBatchFailure,
+  ThankYouSubscription,
+} from "./thankYouService";
