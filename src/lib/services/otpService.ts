@@ -59,13 +59,12 @@ export class OtpService {
 
     const delivery = await whatsappService.sendOtpCode(normalized, code);
 
-    if (delivery.sent) {
-      return { autoSent: true, code };
-    }
-
+    // Le code est toujours renvoyé à l'app (connexion sans quitter la page).
+    // WhatsApp sert de notification / secours sur le téléphone.
     return {
-      whatsappUrl: delivery.link,
-      ...(process.env.NODE_ENV === "development" ? { code } : {}),
+      code,
+      autoSent: delivery.sent,
+      ...(delivery.sent ? {} : { whatsappUrl: delivery.link }),
     };
   }
 

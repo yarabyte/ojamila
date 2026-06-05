@@ -1,15 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { OtpCodeInput } from "@/components/client/otp-code-input";
-import { extractOtpFromClipboard } from "@/lib/otp-clipboard";
-import { CheckCircle2, ClipboardPaste } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
-type Step = "phone" | "code";
+type Step = "phone" | "code" | "connecting";
 
 export function ClientLoginForm({
   redirectTo = "/client/qr",
@@ -22,44 +21,7 @@ export function ClientLoginForm({
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [autoSent, setAutoSent] = useState(false);
-  const [codeInApp, setCodeInApp] = useState(false);
-  const [pasteHint, setPasteHint] = useState<string | null>(null);
-
-  const tryFillFromClipboard = useCallback(async (silent = false) => {
-    if (!navigator.clipboard?.readText) return false;
-    try {
-      const text = await navigator.clipboard.readText();
-      const digits = extractOtpFromClipboard(text);
-      if (digits) {
-        setCode(digits);
-        if (!silent) setPasteHint("Code collé.");
-        setError(null);
-        return true;
-      }
-      if (!silent) {
-        setPasteHint("Copiez le message à 6 chiffres dans WhatsApp, puis réessayez.");
-      }
-    } catch {
-      if (!silent) {
-        setPasteHint("Impossible de lire le presse-papiers — saisissez le code à la main.");
-      }
-    }
-    return false;
-  }, []);
-
-  useEffect(() => {
-    if (step !== "code" || codeInApp) return;
-
-    function onVisible() {
-      if (document.visibilityState === "visible") {
-        void tryFillFromClipboard(true);
-      }
-    }
-
-    document.addEventListener("visibilitychange", onVisible);
-    return () => document.removeEventListener("visibilitychange", onVisible);
-  }, [step, codeInApp, tryFillFromClipboard]);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   async function verifyWithCode(codeValue: string) {
     const res = await fetch("/api/client/otp/verify", {
@@ -81,9 +43,7 @@ export function ClientLoginForm({
     e.preventDefault();
     setLoading(true);
     setError(null);
-    setAutoSent(false);
-    setCodeInApp(false);
-    setPasteHint(null);
+    setStatusMessage(null);
     try {
       const res = await fetch("/api/client/otp/request", {
         method: "POST",
@@ -96,20 +56,26 @@ export function ClientLoginForm({
         return;
       }
 
-      if (data.autoSent) setAutoSent(true);
-
-      if (data.code) {
-        setCode(data.code);
-        setCodeInApp(true);
-        setStep("code");
+      if (!data.code) {
+        setError("Impossible d'obtenir le code. Réessayez.");
         return;
       }
 
-      if (data.whatsappUrl) {
-        window.open(data.whatsappUrl, "_blank");
+      setCode(data.code);
+      setStep("connecting");
+      setStatusMessage(
+        data.autoSent
+          ? "Connexion en cours… (code aussi envoyé sur WhatsApp)"
+          : "Connexion en cours…"
+      );
+
+      const ok = await verifyWithCode(data.code);
+      if (!ok) {
+        setStep("code");
+        setStatusMessage(
+          "Saisissez le code ci-dessous. Ne quittez pas cette page pour coller dans WhatsApp."
+        );
       }
-      setCode("");
-      setStep("code");
     } finally {
       setLoading(false);
     }
@@ -126,56 +92,33 @@ export function ClientLoginForm({
     }
   }
 
+  if (step === "connecting") {
+    return (
+      <div className="flex flex-col items-center gap-4 py-10 text-center">
+        <Loader2 className="h-10 w-10 animate-spin text-gold" />
+        <p className="text-sm font-medium text-foreground">{statusMessage}</p>
+        <p className="text-xs text-muted-foreground">
+          Restez sur cette page — ne passez pas par WhatsApp.
+        </p>
+      </div>
+    );
+  }
+
   if (step === "code") {
     return (
       <form onSubmit={verifyCode} className="space-y-4">
-        {codeInApp ? (
-          <div className="flex gap-3 rounded-xl border border-success/30 bg-success/10 px-4 py-3 text-sm">
-            <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-success" />
-            <div>
-              <p className="font-semibold text-foreground">Code rempli dans l&apos;application</p>
-              <p className="mt-1 text-muted-foreground">
-                Également envoyé sur WhatsApp au <strong>{phone}</strong>.
-                Touchez <strong>Valider</strong> pour continuer.
-              </p>
-            </div>
-          </div>
-        ) : (
-          <>
-            <p className="text-sm text-muted-foreground">
-              {autoSent
-                ? "Code envoyé sur WhatsApp au "
-                : "Ouvrez WhatsApp pour le code envoyé au "}
-              <strong>{phone}</strong>.
-            </p>
-            <div className="rounded-xl border border-gold/30 bg-gold-soft/40 px-3 py-3 text-sm leading-relaxed text-muted-foreground">
-              Copiez le message à <strong>6 chiffres seuls</strong>, puis
-              utilisez <strong>Coller le code</strong> ci-dessous.
-            </div>
-          </>
+        <p className="rounded-xl bg-warning/10 px-3 py-3 text-sm text-warning">
+          La connexion automatique a échoué. Saisissez le code affiché dans les
+          cases ci-dessous (pas dans WhatsApp).
+        </p>
+        {statusMessage && (
+          <p className="text-xs text-muted-foreground">{statusMessage}</p>
         )}
-
         <div className="space-y-2">
           <Label>Code à 6 chiffres</Label>
           <OtpCodeInput value={code} onChange={setCode} disabled={loading} />
         </div>
-
-        {!codeInApp && (
-          <Button
-            type="button"
-            variant="secondary"
-            className="w-full gap-2"
-            onClick={() => void tryFillFromClipboard(false)}
-            disabled={loading}
-          >
-            <ClipboardPaste className="h-4 w-4" />
-            Coller le code
-          </Button>
-        )}
-
-        {pasteHint && <p className="text-xs text-success">{pasteHint}</p>}
         {error && <p className="text-sm text-danger">{error}</p>}
-
         <Button
           type="submit"
           className="w-full"
@@ -191,8 +134,7 @@ export function ClientLoginForm({
           onClick={() => {
             setStep("phone");
             setCode("");
-            setCodeInApp(false);
-            setPasteHint(null);
+            setError(null);
           }}
         >
           Changer de numéro
@@ -204,7 +146,8 @@ export function ClientLoginForm({
   return (
     <form onSubmit={requestCode} className="space-y-4">
       <p className="text-sm text-muted-foreground">
-        Le code s&apos;affichera ici et sera envoyé sur votre WhatsApp.
+        <strong>Restez sur cette page.</strong> Après validation, vous serez
+        connecté automatiquement — inutile d&apos;ouvrir WhatsApp.
       </p>
       <div className="space-y-2">
         <Label htmlFor="phone">Numéro WhatsApp</Label>
@@ -216,11 +159,12 @@ export function ClientLoginForm({
           placeholder="6XX XXX XXX"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
+          autoComplete="tel"
         />
       </div>
       {error && <p className="text-sm text-danger">{error}</p>}
       <Button type="submit" className="w-full" size="lg" disabled={loading}>
-        {loading ? "…" : "Recevoir mon code"}
+        {loading ? "Connexion…" : "Se connecter"}
       </Button>
     </form>
   );
