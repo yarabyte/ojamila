@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
+import { extractOtpFromClipboard } from "@/lib/otp-clipboard";
 import { cn } from "@/lib/utils";
 
 function extractDigits(raw: string, max = 6): string {
@@ -35,6 +36,12 @@ export function OtpCodeInput({
   }
 
   function applyDigits(raw: string, startIndex = 0) {
+    const extracted = extractOtpFromClipboard(raw);
+    if (extracted) {
+      setCode(extracted);
+      focusAt(5);
+      return;
+    }
     const clean = extractDigits(raw);
     if (!clean) return;
     const merged = (value.slice(0, startIndex) + clean).slice(0, 6);

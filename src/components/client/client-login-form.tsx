@@ -1,11 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { OtpCodeInput } from "@/components/client/otp-code-input";
+import { extractOtpFromClipboard } from "@/lib/otp-clipboard";
 import { ClipboardPaste } from "lucide-react";
 
 type Step = "phone" | "code";
@@ -25,12 +26,53 @@ export function ClientLoginForm({
   const [autoSent, setAutoSent] = useState(false);
   const [pasteHint, setPasteHint] = useState<string | null>(null);
 
+  const tryFillFromClipboard = useCallback(async (silent = false) => {
+    if (!navigator.clipboard?.readText) return false;
+    try {
+      const text = await navigator.clipboard.readText();
+      const digits = extractOtpFromClipboard(text);
+      if (digits) {
+        setCode(digits);
+        if (!silent) setPasteHint("Code collé.");
+        else setPasteHint("Code détecté depuis WhatsApp.");
+        setError(null);
+        return true;
+      }
+      if (!silent) {
+        setPasteHint(
+          "Copiez le 2e message WhatsApp (6 chiffres seuls), puis réessayez."
+        );
+      }
+    } catch {
+      if (!silent) {
+        setPasteHint(
+          "Ouvrez WhatsApp → copiez le message avec uniquement 6 chiffres → revenez ici → Coller."
+        );
+      }
+    }
+    return false;
+  }, []);
+
+  useEffect(() => {
+    if (step !== "code") return;
+
+    function onVisible() {
+      if (document.visibilityState === "visible") {
+        void tryFillFromClipboard(true);
+      }
+    }
+
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [step, tryFillFromClipboard]);
+
   async function requestCode(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
     setDevCode(null);
     setAutoSent(false);
+    setPasteHint(null);
     try {
       const res = await fetch("/api/client/otp/request", {
         method: "POST",
@@ -55,29 +97,11 @@ export function ClientLoginForm({
     }
   }
 
-  async function pasteFromClipboard() {
-    setPasteHint(null);
-    setError(null);
-    try {
-      const text = await navigator.clipboard.readText();
-      const digits = text.replace(/\D/g, "").slice(0, 6);
-      if (digits.length === 6) {
-        setCode(digits);
-        setPasteHint("Code collé.");
-        return;
-      }
-      setPasteHint("Presse-papiers sans code à 6 chiffres — copiez la ligne du code dans WhatsApp.");
-    } catch {
-      setPasteHint(
-        "Collez manuellement : appui long sur le code dans WhatsApp → Copier, puis touchez une case ci-dessus."
-      );
-    }
-  }
-
   async function copyDevCode() {
     if (!devCode) return;
     try {
       await navigator.clipboard.writeText(devCode);
+      setCode(devCode);
       setPasteHint("Code copié.");
     } catch {
       setPasteHint("Copiez le code affiché ci-dessus.");
@@ -111,15 +135,25 @@ export function ClientLoginForm({
       <form onSubmit={verifyCode} className="space-y-4">
         <p className="text-sm text-muted-foreground">
           {autoSent
-            ? "Code envoyé sur WhatsApp au "
+            ? "Deux messages WhatsApp envoyés au "
             : "Code envoyé sur WhatsApp au "}
           <strong>{phone}</strong>.
         </p>
-        <p className="rounded-xl bg-muted/60 px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
-          Dans WhatsApp, le code est sur une <strong>ligne seule</strong> — appui
-          long dessus → <strong>Copier</strong>, puis utilisez le bouton
-          ci-dessous ou collez dans les cases.
-        </p>
+        <div className="rounded-xl border border-gold/30 bg-gold-soft/40 px-3 py-3 text-sm leading-relaxed">
+          <p className="font-semibold text-foreground">1. Ouvrez WhatsApp</p>
+          <p className="mt-1 text-muted-foreground">
+            Le <strong>2e message</strong> ne contient que{" "}
+            <strong>6 chiffres</strong> (ex.{" "}
+            <span className="font-mono">854610</span>). Appui long → Copier.
+          </p>
+          <p className="mt-2 font-semibold text-foreground">
+            2. Revenez ici
+          </p>
+          <p className="mt-1 text-muted-foreground">
+            Le code peut se remplir tout seul, ou touchez{" "}
+            <strong>Coller le code</strong>.
+          </p>
+        </div>
         {devCode && (
           <button
             type="button"
@@ -141,17 +175,22 @@ export function ClientLoginForm({
           type="button"
           variant="secondary"
           className="w-full gap-2"
-          onClick={pasteFromClipboard}
+          onClick={() => void tryFillFromClipboard(false)}
           disabled={loading}
         >
           <ClipboardPaste className="h-4 w-4" />
           Coller le code
         </Button>
         {pasteHint && (
-          <p className="text-xs text-muted-foreground">{pasteHint}</p>
+          <p className="text-xs text-success">{pasteHint}</p>
         )}
         {error && <p className="text-sm text-danger">{error}</p>}
-        <Button type="submit" className="w-full" size="lg" disabled={loading || code.length < 6}>
+        <Button
+          type="submit"
+          className="w-full"
+          size="lg"
+          disabled={loading || code.length < 6}
+        >
           {loading ? "…" : "Valider"}
         </Button>
         <Button
@@ -161,6 +200,7 @@ export function ClientLoginForm({
           onClick={() => {
             setStep("phone");
             setCode("");
+            setPasteHint(null);
           }}
         >
           Changer de numéro

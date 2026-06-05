@@ -89,7 +89,8 @@ export class WhatsAppService {
     phone: string,
     code: string
   ): Promise<SendMessageResult & { error?: string }> {
-    const message = `Code de connexion JAMILA\n\n${code}\n\nValide 10 minutes. Ne le partagez pas.`;
+    const intro =
+      "JAMILA — votre code de connexion (10 min) est dans le message suivant.";
     const provider = getActiveWhatsAppProvider();
     const templateName = process.env.WHATSAPP_OTP_TEMPLATE_NAME;
 
@@ -108,17 +109,24 @@ export class WhatsAppService {
     }
 
     if (provider) {
-      const result = await provider.sendText(phone, message);
-      if (result.sent) {
+      const introResult = await provider.sendText(phone, intro);
+      if (!introResult.sent) {
+        console.warn(`WhatsApp OTP intro (${provider.name}) failed:`, introResult.error);
+      } else {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
+
+      const codeResult = await provider.sendText(phone, code);
+      if (codeResult.sent) {
         return { sent: true, method: "api", provider: provider.name };
       }
-      console.warn(`WhatsApp OTP (${provider.name}) failed:`, result.error);
+      console.warn(`WhatsApp OTP code (${provider.name}) failed:`, codeResult.error);
     }
 
     return {
       sent: false,
       method: "wa.me",
-      link: this.buildWaMeLink(phone, message),
+      link: this.buildWaMeLink(phone, code),
     };
   }
 

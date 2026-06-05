@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ClientLoginForm } from "@/components/client/client-login-form";
-import { ClientLogoutButton } from "@/components/client/client-logout-button";
 import { ClientPushButton } from "@/components/client/client-push-button";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -47,13 +46,10 @@ export default async function ClientPage() {
 
   return (
     <>
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <PageHeader
-          title={`Bonjour${user?.name ? `, ${user.name}` : ""}`}
-          description={phone}
-        />
-        <ClientLogoutButton />
-      </div>
+      <PageHeader
+        title={`Bonjour${user?.name ? `, ${user.name}` : ""}`}
+        description={phone}
+      />
 
       {activeSub && (
         <Button asChild className="mb-6 w-full gap-2 sm:w-auto" size="lg">
