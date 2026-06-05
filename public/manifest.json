@@ -37,7 +37,7 @@
       "name": "Formules",
       "short_name": "Formules",
       "description": "Voir les formules d'abonnement",
-      "url": "/?source=shortcut",
+      "url": "/formules?source=shortcut",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {

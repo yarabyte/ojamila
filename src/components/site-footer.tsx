@@ -33,7 +33,7 @@ export function SiteFooter({ className }: { className?: string }) {
 
         <div className="mt-10 flex flex-col gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
           <nav className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-white/70">
-            <Link href="/" className="hover:text-gold">
+            <Link href="/formules" className="hover:text-gold">
               Formules
             </Link>
             <Link href="/client" className="hover:text-gold">

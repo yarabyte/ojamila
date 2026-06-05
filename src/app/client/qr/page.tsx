@@ -44,7 +44,7 @@ export default async function ClientQrPage() {
             Souscrivez à une formule pour obtenir votre QR.
           </p>
           <Button asChild className="mt-4 w-full">
-            <Link href="/">Voir les formules</Link>
+            <Link href="/formules">Voir les formules</Link>
           </Button>
         </Card>
       </>

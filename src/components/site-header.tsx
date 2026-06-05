@@ -7,7 +7,7 @@ import { VENUE_ADDRESS, VENUE_NAME } from "@/lib/venue";
 import { cn } from "@/lib/utils";
 
 const publicLinks = [
-  { href: "/", label: "Formules" },
+  { href: "/formules", label: "Formules" },
   { href: "/client/qr", label: "Mon QR" },
   { href: "/client", label: "Mon espace" },
   { href: "/cgu", label: "CGU" },
@@ -15,6 +15,9 @@ const publicLinks = [
 
 function isLinkActive(href: string, activePath?: string): boolean {
   if (!activePath) return false;
+  if (href === "/formules") {
+    return activePath === "/formules" || activePath.startsWith("/subscribe/");
+  }
   if (href === "/") return activePath === "/";
   if (href === "/client/qr") {
     return (

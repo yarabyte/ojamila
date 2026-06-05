@@ -13,6 +13,7 @@ import {
   Menu,
   QrCode,
   Store,
+  UtensilsCrossed,
   X,
 } from "lucide-react";
 import { VENUE_NAME } from "@/lib/venue";
@@ -71,7 +72,13 @@ export function AppSidebar({
       icon: LayoutGrid,
       match: (p) => p === "/client",
     },
-    { href: "/", label: "Formules", icon: Home },
+    { href: "/", label: "Accueil", icon: Home },
+    {
+      href: "/formules",
+      label: "Formules",
+      icon: UtensilsCrossed,
+      match: (p) => p === "/formules" || p.startsWith("/subscribe/"),
+    },
     { href: "/cgu", label: "CGU", icon: FileText },
     {
       href: staffHref,

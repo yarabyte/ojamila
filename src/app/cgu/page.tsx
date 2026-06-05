@@ -24,7 +24,7 @@ export default async function CguPage() {
         </article>
         <div className="mt-8 flex flex-wrap gap-3">
           <Button asChild>
-            <Link href="/">Voir les formules</Link>
+            <Link href="/formules">Voir les formules</Link>
           </Button>
           <Button variant="secondary" asChild>
             <Link href="/client/qr">Mon QR</Link>

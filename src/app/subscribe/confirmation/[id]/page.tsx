@@ -85,7 +85,7 @@ export default async function ConfirmationPage({
               )}
               {isActive && <WhatsAppButton subscriptionId={sub.id} />}
               <Button variant="secondary" asChild className="w-full">
-                <Link href="/">Accueil</Link>
+                <Link href="/">Menu</Link>
               </Button>
             </div>
           </CardContent>

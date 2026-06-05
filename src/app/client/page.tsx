@@ -69,7 +69,7 @@ export default async function ClientPage() {
           <CardContent className="py-8 text-center">
             <p className="text-muted-foreground">Aucun abonnement.</p>
             <Button asChild className="mt-4">
-              <Link href="/">Découvrir les formules</Link>
+              <Link href="/formules">Découvrir les formules</Link>
             </Button>
           </CardContent>
         </Card>
