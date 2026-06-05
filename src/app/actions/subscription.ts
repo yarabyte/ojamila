@@ -227,8 +227,9 @@ export async function sendWhatsAppQrImage(
     if (!result.sent) {
       return { success: false, error: result.error };
     }
+    const provider = whatsappService.getProviderName();
     const textOnly =
-      whatsappService.getProviderName() === "twilio" &&
+      (provider === "twilio" || provider === "wasender") &&
       !process.env.NEXT_PUBLIC_APP_URL?.includes("vercel.app") &&
       !process.env.NEXT_PUBLIC_APP_URL?.startsWith("https://");
     return { success: true, data: { method: "api", textOnly } };

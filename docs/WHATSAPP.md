@@ -1,37 +1,59 @@
 # WhatsApp — envoi automatique
 
-JAMILA supporte **deux fournisseurs**. Basculez avec `WHATSAPP_PROVIDER`.
+JAMILA supporte **trois fournisseurs**. Basculez avec `WHATSAPP_PROVIDER`.
 
 ```env
-WHATSAPP_PROVIDER=twilio   # ou meta, ou auto (Twilio puis Meta)
+WHATSAPP_PROVIDER=wasender   # ou twilio, meta, auto
 ```
 
 ---
 
-## Option A — Twilio (recommandé)
+## Option A — WasenderAPI (recommandé)
 
-Plus simple que Meta direct, surtout si la création de templates est bloquée.
+API simple : texte, image (via URL publique), OTP.
 
 ### 1. Créer un compte
 
-1. [console.twilio.com](https://console.twilio.com) → inscription
-2. **Messaging → Try WhatsApp → Sandbox**
-3. Noter :
-   - **Account SID**
-   - **Auth Token**
-   - Numéro sandbox : `whatsapp:+14155238886`
+1. [wasenderapi.com](https://wasenderapi.com) → inscription
+2. Connecter une session WhatsApp (QR code)
+3. Copier l’**API Key** depuis le dashboard
 
-### 2. Activer le sandbox (tests)
+### 2. Variables `.env` et Vercel
 
-Depuis votre téléphone, envoyez à **+1 415 523 8886** :
-
-```
-join <mot-de-votre-sandbox>
+```env
+WHATSAPP_PROVIDER=wasender
+WASENDER_API_KEY="votre-clé-api"
 ```
 
-(ex. `join shadow-mountain` — affiché dans la console Twilio)
+### 3. Tester
 
-### 3. Variables `.env` et Vercel
+- Staff → activer un abonnement → **Envoyer le QR (image)**
+- Client → **Recevoir mon code** → OTP envoyé automatiquement
+- Liste d’attente → promotion → message auto
+
+### 4. QR image en local vs production
+
+Wasender télécharge l’image depuis une **URL publique** (`NEXT_PUBLIC_APP_URL/api/public/qr/...`).
+
+| Environnement | Comportement |
+|---------------|--------------|
+| **Local** (`http://localhost`) | Message **texte** avec lien QR (pas d’image) |
+| **Production** (`https://ojamila.vercel.app`) | Image QR + légende |
+
+### 5. Test curl
+
+```bash
+curl -X POST "https://www.wasenderapi.com/api/send-message" \
+  -H "Authorization: Bearer VOTRE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"to":"+237695606060","text":"Test JAMILA"}'
+```
+
+Doc : [wasenderapi.com/api-docs](https://wasenderapi.com/api-docs)
+
+---
+
+## Option B — Twilio
 
 ```env
 WHATSAPP_PROVIDER=twilio
@@ -40,72 +62,56 @@ TWILIO_AUTH_TOKEN="..."
 TWILIO_WHATSAPP_FROM="whatsapp:+14155238886"
 ```
 
-### 4. Tester
-
-- Staff → activer un abonnement → **Envoyer le QR (image)**
-- Client → **Recevoir mon code** → OTP envoyé automatiquement
-
-### 5. Production (numéro Ô JAMILA)
-
-1. Twilio Console → **WhatsApp Senders** → demander un numéro business
-2. Meta valide le numéro via Twilio (Twilio gère les templates)
-3. Remplacer `TWILIO_WHATSAPP_FROM` par `whatsapp:+237XXXXXXXXX`
-
-### Tarifs indicatifs
-
-~0,005–0,08 USD / conversation selon le pays. Vérifier [twilio.com/whatsapp/pricing](https://www.twilio.com/whatsapp/pricing).
+Voir section Twilio ci-dessous pour le sandbox.
 
 ---
 
-## Option B — Meta Cloud API direct
-
-Voir section Meta ci-dessous si vous préférez rester sur l’API Graph Facebook.
+## Option C — Meta Cloud API direct
 
 ```env
 WHATSAPP_PROVIDER=meta
 WHATSAPP_ACCESS_TOKEN="EAA..."
-WHATSAPP_PHONE_NUMBER_ID="234568036414845"
+WHATSAPP_PHONE_NUMBER_ID="..."
 WHATSAPP_API_VERSION="v25.0"
-```
-
-Test curl :
-
-```bash
-curl -X POST \
-  "https://graph.facebook.com/v25.0/VOTRE_PHONE_ID/messages" \
-  -H "Authorization: Bearer VOTRE_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"messaging_product":"whatsapp","to":"237695606060","type":"template","template":{"name":"hello_world","language":{"code":"en_US"}}}'
 ```
 
 ---
 
 ## Comportement JAMILA
 
-| Action | Twilio | Meta | Aucun |
-|--------|--------|------|-------|
-| QR image | MediaUrl signée | Upload API | wa.me / partage |
-| Code OTP | Texte auto | Template ou texte | wa.me |
-| Liste d'attente | Texte auto | Texte ou wa.me | wa.me |
+| Action | Wasender | Twilio | Meta | Aucun |
+|--------|----------|--------|------|-------|
+| QR image | imageUrl (prod) | MediaUrl | Upload API | wa.me |
+| Code OTP | Texte auto | Texte auto | Template ou texte | wa.me |
+| Liste d'attente | Texte auto | Texte auto | Texte | wa.me |
 
 ---
+
+## Dépannage WasenderAPI
+
+| Erreur | Solution |
+|--------|----------|
+| `WasenderAPI non configuré` | Ajouter `WASENDER_API_KEY` dans `.env` / Vercel |
+| Image non reçue en local | Normal — utilisez `https://` en prod ou le lien texte |
+| Session déconnectée | Reconnecter WhatsApp dans le dashboard Wasender |
+| Numéro invalide | Format E.164 : `+237695606060` |
 
 ## Dépannage Twilio
 
 | Erreur | Solution |
 |--------|----------|
 | `63007` — not in sandbox | Envoyer `join xxx` au numéro sandbox |
-| `63016` — outside 24h window | Utiliser un Content Template (`TWILIO_WHATSAPP_CONTENT_SID`) |
-| Image non reçue | Vérifier `NEXT_PUBLIC_APP_URL` (URL publique pour le QR) |
+| Limite 5 msg/jour (essai) | Ajouter une carte sur Twilio |
+| Image non reçue | Vérifier `NEXT_PUBLIC_APP_URL` (HTTPS public) |
 
 ## Dépannage Meta
 
 | Erreur | Solution |
 |--------|----------|
-| Template creation denied | Vérifier l’entreprise Meta ou passer sur Twilio |
-| `Recipient not in allowed list` | Ajouter le numéro en mode dev (API Setup → To) |
+| Template creation denied | Passer sur Wasender ou Twilio |
+| `Recipient not in allowed list` | Ajouter le numéro en mode dev |
 
 ## Sécurité
 
-- Ne jamais commiter tokens Twilio ou Meta
-- Régénérer les tokens en cas de fuite
+- Ne jamais commiter `WASENDER_API_KEY`, tokens Twilio ou Meta
+- Régénérer les clés en cas de fuite

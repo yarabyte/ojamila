@@ -25,8 +25,8 @@ export function verifyQrMediaSignature(
   }
 }
 
-/** Twilio doit pouvoir télécharger l'URL depuis Internet (HTTPS public). */
-export function isTwilioReachableMediaUrl(url: string): boolean {
+/** L'URL doit être téléchargeable depuis Internet (Wasender, Twilio, etc.). */
+export function isPublicMediaUrl(url: string): boolean {
   try {
     const parsed = new URL(url);
     if (!["http:", "https:"].includes(parsed.protocol)) return false;
@@ -49,10 +49,16 @@ export function isTwilioReachableMediaUrl(url: string): boolean {
   }
 }
 
-export function canSendQrImageViaTwilio(): boolean {
+/** @deprecated utiliser isPublicMediaUrl */
+export const isTwilioReachableMediaUrl = isPublicMediaUrl;
+
+export function canSendQrImageViaApi(): boolean {
   const base = process.env.NEXT_PUBLIC_APP_URL;
   if (!base) return false;
-  return isTwilioReachableMediaUrl(
+  return isPublicMediaUrl(
     `${base.replace(/\/$/, "")}/api/public/qr/example`
   );
 }
+
+/** @deprecated utiliser canSendQrImageViaApi */
+export const canSendQrImageViaTwilio = canSendQrImageViaApi;

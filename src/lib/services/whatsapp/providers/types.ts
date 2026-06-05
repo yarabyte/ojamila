@@ -13,7 +13,7 @@ export type SendResult =
   | { sent: false; error: string };
 
 export interface WhatsAppProvider {
-  readonly name: "meta" | "twilio";
+  readonly name: "meta" | "twilio" | "wasender";
   isConfigured(): boolean;
   sendText(phone: string, text: string): Promise<SendResult>;
   sendTemplate(

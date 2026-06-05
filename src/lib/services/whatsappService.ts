@@ -5,7 +5,7 @@ import {
   getWhatsAppProviderLabel,
 } from "./whatsapp/providers/get-provider";
 import type { WhatsAppTemplateComponent } from "./whatsapp/providers/types";
-import { buildPublicQrMediaUrl, isTwilioReachableMediaUrl } from "./whatsapp/qr-media-url";
+import { buildPublicQrMediaUrl, isPublicMediaUrl } from "./whatsapp/qr-media-url";
 
 export type WhatsAppMessageContext = {
   name: string;
@@ -134,10 +134,13 @@ export class WhatsAppService {
     }
 
     let mediaUrl: string | undefined;
-    if (provider.name === "twilio" && options?.subscriptionId) {
+    if (
+      (provider.name === "twilio" || provider.name === "wasender") &&
+      options?.subscriptionId
+    ) {
       try {
         const url = buildPublicQrMediaUrl(options.subscriptionId);
-        if (isTwilioReachableMediaUrl(url)) {
+        if (isPublicMediaUrl(url)) {
           mediaUrl = url;
         }
       } catch (e) {

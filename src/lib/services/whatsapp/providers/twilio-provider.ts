@@ -1,5 +1,5 @@
 import { normalizePhone } from "@/lib/phone";
-import { isTwilioReachableMediaUrl } from "../qr-media-url";
+import { isPublicMediaUrl } from "../qr-media-url";
 import type { SendResult, WhatsAppProvider } from "./types";
 
 type TwilioSendResult = SendResult;
@@ -33,7 +33,18 @@ function parseTwilioError(body: string): string {
       return "URL image inaccessible depuis Twilio (localhost). Message texte envoyé à la place.";
     }
     if (json.code === 63007) {
-      return "Numéro non autorisé — rejoignez le sandbox Twilio (join xxx) depuis WhatsApp.";
+      const join = process.env.TWILIO_SANDBOX_JOIN_PHRASE;
+      const sandboxTo = process.env.TWILIO_SANDBOX_TO ?? "+1 415 523 8886";
+      if (join) {
+        return `Numéro non autorisé. Depuis le WhatsApp du client (+237…), envoyez « ${join} » au ${sandboxTo}, puis réessayez.`;
+      }
+      return `Numéro non autorisé — console Twilio → Sandbox : le client doit envoyer « join … » au ${sandboxTo} avant de recevoir des messages.`;
+    }
+    if (
+      json.code === 63038 ||
+      msg.toLowerCase().includes("daily messages limit")
+    ) {
+      return "Limite Twilio atteinte (5 messages/jour en essai gratuit). Réessayez demain, ajoutez une carte bancaire sur Twilio, ou utilisez le lien wa.me manuel.";
     }
     if (json.code === 63016) {
       return "Hors fenêtre 24 h — configurez un Content Template Twilio.";
@@ -144,7 +155,7 @@ export const twilioWhatsAppProvider: WhatsAppProvider = {
 
   async sendImage(phone, _imagePng, caption, options) {
     const mediaUrl =
-      options?.mediaUrl && isTwilioReachableMediaUrl(options.mediaUrl)
+      options?.mediaUrl && isPublicMediaUrl(options.mediaUrl)
         ? options.mediaUrl
         : undefined;
 
