@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { GiftMealSection } from "@/components/client/gift-meal-section";
 import { QrCard } from "@/components/subscription/qr-card";
 import { WhatsAppButton } from "@/components/subscription/whatsapp-button";
 import { Button } from "@/components/ui/button";
@@ -51,6 +52,10 @@ export async function ClientQrView({
             expiresAt={sub.expiresAt}
           />
           <WhatsAppButton subscriptionId={sub.id} />
+          <GiftMealSection
+            subscriptionId={sub.id}
+            mealsRemaining={mealsRemaining}
+          />
           <p className="text-center text-xs text-muted-foreground">
             Conservez ce QR : il sera demandé à chaque repas.
           </p>

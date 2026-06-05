@@ -6,6 +6,7 @@ import {
   sendWhatsAppQrImage,
   sendWhatsAppTextForSubscription,
 } from "@/app/actions/subscription";
+import { IndeterminateBar } from "@/components/ui/loading-state";
 import { Button } from "@/components/ui/button";
 import {
   dataUrlToFile,
@@ -97,6 +98,14 @@ export function WhatsAppButton({
 
   return (
     <div className={cn("space-y-2", className)}>
+      {loading && (
+        <div className="space-y-1.5 rounded-xl bg-muted/50 px-3 py-2">
+          <p className="text-xs font-medium text-muted-foreground">
+            Préparation de l&apos;envoi WhatsApp…
+          </p>
+          <IndeterminateBar />
+        </div>
+      )}
       <Button
         type="button"
         variant="default"

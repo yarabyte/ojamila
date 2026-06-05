@@ -15,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { VENUE_NAME } from "@/lib/venue";
+import { ActionOverlay } from "@/components/ui/loading-state";
 import { Lock } from "lucide-react";
 
 export default function LoginPage() {
@@ -49,6 +50,12 @@ export default function LoginPage() {
   }
 
   return (
+    <>
+      <ActionOverlay
+        open={loading}
+        message="Connexion en cours…"
+        detail="Vérification de vos identifiants staff."
+      />
       <main className="flex flex-1 items-center justify-center px-4 py-12">
         <Card className="w-full max-w-md shadow-card">
           <CardHeader className="text-center">
@@ -102,5 +109,6 @@ export default function LoginPage() {
           </CardContent>
         </Card>
       </main>
+    </>
   );
 }

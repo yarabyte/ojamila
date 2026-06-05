@@ -26,6 +26,13 @@ enum PaymentMethod {
   CASH
 }
 
+enum MealGiftStatus {
+  PENDING
+  CONSUMED
+  CANCELLED
+  EXPIRED
+}
+
 model User {
   id               String         @id @default(cuid())
   name             String
@@ -99,6 +106,7 @@ model Subscription {
   cguAcceptedAt    DateTime
   cguVersion       String
   consumptions     Consumption[]
+  mealGifts        MealGift[]
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
 
@@ -112,9 +120,28 @@ model Consumption {
   subscriptionId String
   servedBy       User?        @relation("MealsServed", fields: [servedById], references: [id])
   servedById     String?
+  mealGift       MealGift?
   consumedAt     DateTime     @default(now())
 
   @@index([subscriptionId, consumedAt])
+}
+
+model MealGift {
+  id               String         @id @default(cuid())
+  subscription     Subscription   @relation(fields: [subscriptionId], references: [id])
+  subscriptionId   String
+  recipientPhone   String
+  giftToken        String         @unique
+  shortCode        String         @unique
+  status           MealGiftStatus @default(PENDING)
+  consumption      Consumption?   @relation(fields: [consumptionId], references: [id])
+  consumptionId    String?        @unique
+  createdAt        DateTime       @default(now())
+  consumedAt       DateTime?
+  expiresAt        DateTime
+
+  @@index([subscriptionId, status])
+  @@index([recipientPhone])
 }
 
 model AppSettings {
@@ -122,6 +149,7 @@ model AppSettings {
   dailyMealLimitDefault   Int    @default(1)
   validityDaysDefault     Int    @default(180)
   whatsappMessageTemplate String @default("Bonjour {{name}} ! Votre abonnement JAMILA est prêt. Consultez votre QR ici : {{qrLink}} — Code secours : {{shortCode}}. Conservez-le bien, vous en aurez besoin pour valider vos repas.")
+  whatsappGiftTemplate    String @default("Bonjour ! {{senderName}} vous offre un repas chez Ô JAMILA. Présentez ce QR à la caisse — usage unique. Code secours : {{shortCode}}.")
   cguText                 String @db.Text
   cguVersion              String @default("1.0")
   fundraisingGoalFcfa     Int    @default(10000000)

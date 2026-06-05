@@ -6,6 +6,7 @@ import { z } from "zod";
 const itemSchema = z.object({
   localId: z.string(),
   subscriptionId: z.string(),
+  giftId: z.string().optional(),
   queuedAt: z.string(),
 });
 
@@ -36,7 +37,9 @@ export async function POST(req: Request) {
     for (const item of parsed.data.items) {
       try {
         const result = await consumptionService.consumeMeal(
-          { subscriptionId: item.subscriptionId },
+          item.giftId
+            ? { giftId: item.giftId }
+            : { subscriptionId: item.subscriptionId },
           session.user.id
         );
         results.push({

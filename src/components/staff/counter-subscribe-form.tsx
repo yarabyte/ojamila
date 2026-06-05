@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { subscribeAtCounter } from "@/app/actions/staff";
+import { ActionOverlay } from "@/components/ui/loading-state";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -43,6 +44,12 @@ export function CounterSubscribeForm({
   }
 
   return (
+    <>
+    <ActionOverlay
+      open={loading}
+      message="Création de l'abonnement…"
+      detail="Enregistrement du client et réservation de la place."
+    />
     <form onSubmit={onSubmit} className="space-y-4">
       <div className="space-y-2">
         <Label>Formule</Label>
@@ -98,8 +105,9 @@ export function CounterSubscribeForm({
       {error && <p className="text-sm text-danger">{error}</p>}
 
       <Button type="submit" className="w-full" disabled={loading || !cgu}>
-        {loading ? "…" : "Créer l'abonnement"}
+        {loading ? "Création…" : "Créer l'abonnement"}
       </Button>
     </form>
+    </>
   );
 }

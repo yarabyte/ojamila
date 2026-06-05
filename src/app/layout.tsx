@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import { AuthSessionProviderRoot } from "@/components/providers/session-provider-root";
+import { NavigationProgress } from "@/components/navigation-progress";
 import { PwaRegister } from "@/components/pwa-register";
 import { PwaInstallPrompt } from "@/components/pwa-install-prompt";
 import "./globals.css";
@@ -55,6 +56,7 @@ export default function RootLayout({
     <html lang="fr">
       <body className={`${inter.variable} ${fraunces.variable} antialiased`}>
         <AuthSessionProviderRoot>
+          <NavigationProgress />
           {children}
           <PwaRegister />
           <PwaInstallPrompt />

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { OtpCodeInput } from "@/components/client/otp-code-input";
-import { Loader2 } from "lucide-react";
+import { ActionOverlay, LoadingState } from "@/components/ui/loading-state";
 
 type Step = "phone" | "code" | "connecting";
 
@@ -94,18 +94,21 @@ export function ClientLoginForm({
 
   if (step === "connecting") {
     return (
-      <div className="flex flex-col items-center gap-4 py-10 text-center">
-        <Loader2 className="h-10 w-10 animate-spin text-gold" />
-        <p className="text-sm font-medium text-foreground">{statusMessage}</p>
-        <p className="text-xs text-muted-foreground">
-          Restez sur cette page — ne passez pas par WhatsApp.
-        </p>
-      </div>
+      <LoadingState
+        message={statusMessage ?? "Connexion en cours…"}
+        detail="Restez sur cette page — ne passez pas par WhatsApp."
+      />
     );
   }
 
   if (step === "code") {
     return (
+      <>
+      <ActionOverlay
+        open={loading}
+        message="Validation du code…"
+        detail="Connexion à votre espace client."
+      />
       <form onSubmit={verifyCode} className="space-y-4">
         <p className="rounded-xl bg-warning/10 px-3 py-3 text-sm text-warning">
           La connexion automatique a échoué. Saisissez le code affiché dans les
@@ -140,10 +143,17 @@ export function ClientLoginForm({
           Changer de numéro
         </Button>
       </form>
+      </>
     );
   }
 
   return (
+    <>
+    <ActionOverlay
+      open={loading}
+      message="Vérification de votre numéro…"
+      detail="Envoi du code et connexion automatique."
+    />
     <form onSubmit={requestCode} className="space-y-4">
       <p className="text-sm text-muted-foreground">
         <strong>Restez sur cette page.</strong> Après validation, vous serez
@@ -167,5 +177,6 @@ export function ClientLoginForm({
         {loading ? "Connexion…" : "Se connecter"}
       </Button>
     </form>
+    </>
   );
 }

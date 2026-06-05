@@ -90,10 +90,12 @@ function ScanValidationPanel({
             </div>
             <div className="min-w-0 flex-1">
               <h2 className="truncate font-display text-2xl font-semibold text-foreground">
-                {preview.clientName}
+                {preview.isGift && preview.senderName
+                  ? `Offert par ${preview.senderName}`
+                  : preview.clientName}
               </h2>
               <p className="text-sm text-muted-foreground">
-                {preview.formulaName}
+                {preview.isGift ? "Repas offert — usage unique" : preview.formulaName}
               </p>
             </div>
           </div>
@@ -108,7 +110,9 @@ function ScanValidationPanel({
               {preview.mealsRemaining}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              sur {preview.totalMeals} repas
+              {preview.isGift
+                ? "1 repas offert"
+                : `sur ${preview.totalMeals} repas`}
             </p>
           </div>
 
@@ -264,6 +268,7 @@ export function ScanInterface() {
       if (!navigator.onLine) {
         enqueueConsume({
           subscriptionId: preview.subscriptionId,
+          giftId: preview.giftId,
           clientName: preview.clientName,
           formulaName: preview.formulaName,
         });
@@ -280,7 +285,11 @@ export function ScanInterface() {
       const res = await fetch("/api/scan/consume", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subscriptionId: preview.subscriptionId }),
+        body: JSON.stringify(
+          preview.isGift && preview.giftId
+            ? { giftId: preview.giftId }
+            : { subscriptionId: preview.subscriptionId }
+        ),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -292,7 +301,9 @@ export function ScanInterface() {
       }
       setMessage({
         type: "success",
-        text: `Repas validé — ${data.mealsRemaining} restant(s)`,
+        text: preview.isGift
+          ? "Repas offert validé"
+          : `Repas validé — ${data.mealsRemaining} restant(s)`,
       });
       setPreview(null);
       setScanPaused(false);
@@ -301,6 +312,7 @@ export function ScanInterface() {
       if (isNetworkError(e) && preview) {
         enqueueConsume({
           subscriptionId: preview.subscriptionId,
+          giftId: preview.giftId,
           clientName: preview.clientName,
           formulaName: preview.formulaName,
         });
@@ -392,11 +404,14 @@ export function ScanInterface() {
                 </div>
               </div>
               {loading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/55">
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/55 px-6">
                   <div className="flex items-center gap-2 rounded-xl bg-black/70 px-4 py-3 text-sm text-white">
                     <Loader2 className="h-5 w-5 animate-spin text-gold" />
-                    Vérification…
+                    Vérification du QR…
                   </div>
+                  <p className="max-w-xs text-center text-xs text-white/70">
+                    Recherche de l&apos;abonnement et contrôle des repas restants.
+                  </p>
                 </div>
               )}
             </div>

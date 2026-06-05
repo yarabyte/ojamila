@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { activateSubscription } from "@/app/actions/staff";
 import { WhatsAppButton } from "@/components/subscription/whatsapp-button";
+import { ActionOverlay } from "@/components/ui/loading-state";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2 } from "lucide-react";
 
@@ -57,6 +58,12 @@ export function ActivateButton({
   }
 
   return (
+    <>
+    <ActionOverlay
+      open={loading}
+      message="Activation de l'abonnement…"
+      detail="Génération du QR et mise à jour du statut."
+    />
     <div className="space-y-2">
       <Button
         type="button"
@@ -76,5 +83,6 @@ export function ActivateButton({
         </p>
       )}
     </div>
+    </>
   );
 }

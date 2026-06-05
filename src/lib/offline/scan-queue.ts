@@ -1,6 +1,7 @@
 export type PendingConsume = {
   localId: string;
   subscriptionId: string;
+  giftId?: string;
   clientName?: string;
   formulaName?: string;
   queuedAt: string;

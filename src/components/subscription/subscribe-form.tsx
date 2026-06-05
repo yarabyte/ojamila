@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { FormulaAvailability } from "@/lib/services";
 import { VENUE_NAME } from "@/lib/venue";
+import { ActionOverlay } from "@/components/ui/loading-state";
 import { Info } from "lucide-react";
 
 export function SubscribeForm({
@@ -38,6 +39,12 @@ export function SubscribeForm({
   }
 
   return (
+    <>
+    <ActionOverlay
+      open={loading}
+      message="Enregistrement de votre souscription…"
+      detail="Création du compte et réservation de votre place."
+    />
     <form onSubmit={onSubmit} className="space-y-5">
       <input type="hidden" name="formulaId" value={formula.formulaId} />
 
@@ -107,5 +114,6 @@ export function SubscribeForm({
         Paiement en espèces à la caisse {VENUE_NAME}
       </p>
     </form>
+    </>
   );
 }

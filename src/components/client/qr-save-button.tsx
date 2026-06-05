@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { IndeterminateBar } from "@/components/ui/loading-state";
 import { Button } from "@/components/ui/button";
 import { downloadDataUrl, shareQrImageOnDevice, dataUrlToFile } from "@/lib/qr-share-client";
 import { Download, Share2 } from "lucide-react";
@@ -43,7 +44,16 @@ export function QrSaveButton({
   }
 
   return (
-    <div className="flex w-full flex-col gap-2 sm:flex-row">
+    <div className="flex w-full flex-col gap-2">
+      {loading && (
+        <div className="space-y-1.5 rounded-xl bg-muted/50 px-3 py-2">
+          <p className="text-xs font-medium text-muted-foreground">
+            Préparation du partage…
+          </p>
+          <IndeterminateBar />
+        </div>
+      )}
+      <div className="flex w-full flex-col gap-2 sm:flex-row">
       <Button
         type="button"
         variant="secondary"
@@ -52,7 +62,7 @@ export function QrSaveButton({
         disabled={loading}
       >
         <Share2 className="h-4 w-4" />
-        {loading ? "…" : "Enregistrer / partager"}
+        {loading ? "Préparation…" : "Enregistrer / partager"}
       </Button>
       <Button
         type="button"
@@ -69,6 +79,7 @@ export function QrSaveButton({
           {hint}
         </p>
       )}
+      </div>
     </div>
   );
 }

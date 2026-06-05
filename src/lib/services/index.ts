@@ -2,6 +2,7 @@ export { subscriptionService, SubscriptionService } from "./subscriptionService"
 export type { FormulaAvailability, SubscriptionWithRelations } from "./subscriptionService";
 export { consumptionService, ConsumptionService } from "./consumptionService";
 export type { ScanPreview, ConsumeResult } from "./consumptionService";
+export { giftService, GiftService } from "./giftService";
 export { whatsappService, WhatsAppService } from "./whatsappService";
 export { formulaService, FormulaService, formulaInputSchema } from "./formulaService";
 export type { FormulaInput } from "./formulaService";

@@ -5,13 +5,22 @@ import {
   getWhatsAppProviderLabel,
 } from "./whatsapp/providers/get-provider";
 import type { WhatsAppTemplateComponent } from "./whatsapp/providers/types";
-import { buildPublicQrMediaUrl, isPublicMediaUrl } from "./whatsapp/qr-media-url";
+import {
+  buildPublicGiftQrMediaUrl,
+  buildPublicQrMediaUrl,
+  isPublicMediaUrl,
+} from "./whatsapp/qr-media-url";
 
 export type WhatsAppMessageContext = {
   name: string;
   qrLink: string;
   formulaName?: string;
   shortCode?: string;
+};
+
+export type WhatsAppGiftMessageContext = {
+  senderName: string;
+  shortCode: string;
 };
 
 export type SendMessageResult =
@@ -35,6 +44,13 @@ export class WhatsAppService {
   async buildMessage(context: WhatsAppMessageContext): Promise<string> {
     const settings = await getAppSettings();
     return this.applyTemplate(settings.whatsappMessageTemplate, context);
+  }
+
+  async buildGiftMessage(context: WhatsAppGiftMessageContext): Promise<string> {
+    const settings = await getAppSettings();
+    return settings.whatsappGiftTemplate
+      .replace(/\{\{senderName\}\}/g, context.senderName)
+      .replace(/\{\{shortCode\}\}/g, context.shortCode);
   }
 
   buildWaMeLink(phone: string, message: string): string {
@@ -134,7 +150,7 @@ export class WhatsAppService {
     phone: string,
     imagePng: Buffer,
     caption: string,
-    options?: { subscriptionId?: string }
+    options?: { subscriptionId?: string; giftId?: string }
   ): Promise<{ sent: true } | { sent: false; error: string }> {
     const provider = getActiveWhatsAppProvider();
     if (!provider) {
@@ -142,13 +158,14 @@ export class WhatsAppService {
     }
 
     let mediaUrl: string | undefined;
-    if (
-      (provider.name === "twilio" || provider.name === "wasender") &&
-      options?.subscriptionId
-    ) {
+    if (provider.name === "twilio" || provider.name === "wasender") {
       try {
-        const url = buildPublicQrMediaUrl(options.subscriptionId);
-        if (isPublicMediaUrl(url)) {
+        const url = options?.giftId
+          ? buildPublicGiftQrMediaUrl(options.giftId)
+          : options?.subscriptionId
+            ? buildPublicQrMediaUrl(options.subscriptionId)
+            : undefined;
+        if (url && isPublicMediaUrl(url)) {
           mediaUrl = url;
         }
       } catch (e) {
