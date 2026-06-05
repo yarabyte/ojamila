@@ -161,7 +161,7 @@ function ScanValidationPanel({
           size="lg"
           onClick={onConsume}
           disabled={!preview.canConsume || loading}
-          className="w-full gap-2 text-base"
+          className="w-full gap-2 text-base shadow-gold"
         >
           {loading ? (
             <>

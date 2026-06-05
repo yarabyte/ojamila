@@ -58,6 +58,7 @@ export function QrSaveButton({
         type="button"
         variant="secondary"
         className="flex-1 gap-2"
+        size="lg"
         onClick={handleShare}
         disabled={loading}
       >
@@ -67,6 +68,7 @@ export function QrSaveButton({
       <Button
         type="button"
         variant="outline"
+        size="lg"
         className="flex-1 gap-2"
         onClick={handleDownload}
         disabled={loading}

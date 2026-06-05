@@ -20,9 +20,13 @@ export function LandingSplash({
       )}
     >
       <div className="flex flex-1 flex-col items-center justify-center">
-        <div className="relative">
+        <div className="relative animate-scale-in">
           <div
-            className="absolute -inset-6 rounded-full bg-gold/10 blur-2xl"
+            className="absolute -inset-8 rounded-full bg-gold/15 blur-3xl"
+            aria-hidden
+          />
+          <div
+            className="absolute -inset-2 rounded-full ring-1 ring-gold/20"
             aria-hidden
           />
           <Image
@@ -36,14 +40,14 @@ export function LandingSplash({
         </div>
       </div>
 
-      <div className="w-full max-w-xs space-y-4 pb-12 text-center">
-        <p className="font-display text-sm font-medium tracking-wide text-muted-foreground">
+      <div className="safe-bottom-splash w-full max-w-xs space-y-4 text-center">
+        <p className="font-display text-base font-medium tracking-wide text-muted-foreground">
           {VENUE_NAME} — Abonnements repas
         </p>
         <div className="space-y-2">
           {showDeterminate ? (
             <div
-              className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
+              className="h-2 w-full overflow-hidden rounded-full bg-muted"
               role="progressbar"
               aria-valuenow={Math.round(progress)}
               aria-valuemin={0}
@@ -51,12 +55,15 @@ export function LandingSplash({
               aria-label="Chargement"
             >
               <div
-                className="h-full rounded-full bg-gradient-to-r from-gold-deep via-gold to-gold-deep transition-[width] duration-300 ease-out"
+                className={cn(
+                  "h-full rounded-full bg-gradient-to-r from-gold-deep via-gold to-gold-deep transition-[width] duration-300 ease-out",
+                  progress >= 100 && "shadow-gold"
+                )}
                 style={{ width: `${progress}%` }}
               />
             </div>
           ) : (
-            <IndeterminateBar />
+            <IndeterminateBar className="h-2" />
           )}
         </div>
       </div>

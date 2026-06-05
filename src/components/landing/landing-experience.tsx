@@ -13,7 +13,11 @@ export function LandingExperience() {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    if (sessionStorage.getItem(SPLASH_KEY) === "1") {
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    if (reducedMotion || sessionStorage.getItem(SPLASH_KEY) === "1") {
       setPhase("menu");
       return;
     }
@@ -38,7 +42,7 @@ export function LandingExperience() {
     <div className="relative min-h-[100dvh] overflow-hidden">
       <div
         className={cn(
-          "transition-all duration-500 ease-out",
+          "transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]",
           phase === "menu"
             ? "pointer-events-none absolute inset-0 -translate-y-4 opacity-0"
             : "opacity-100"
@@ -50,10 +54,9 @@ export function LandingExperience() {
 
       <div
         className={cn(
-          "transition-all duration-500 ease-out",
           phase === "menu"
-            ? "opacity-100"
-            : "pointer-events-none absolute inset-0 translate-y-4 opacity-0"
+            ? "animate-fade-in opacity-100"
+            : "pointer-events-none absolute inset-0 translate-y-4 opacity-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
         )}
       >
         <HomeMenu />

@@ -110,6 +110,7 @@ export function WhatsAppButton({
         type="button"
         variant="default"
         className="w-full gap-2"
+        size="lg"
         onClick={sendQrAsImage}
         disabled={loading}
       >
@@ -120,7 +121,7 @@ export function WhatsAppButton({
         type="button"
         variant="ghost"
         size="sm"
-        className="w-full gap-2 text-xs text-muted-foreground"
+        className="min-h-11 w-full gap-2 text-xs text-muted-foreground"
         onClick={openLinkOnly}
         disabled={loading}
       >

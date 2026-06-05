@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -45,7 +46,18 @@ export function LoadingState({
         variant === "card" && "rounded-2xl border border-border bg-card py-12 shadow-card",
         className
       )}
+      aria-busy="true"
     >
+      {variant === "page" && (
+        <Image
+          src="/logo.svg"
+          alt=""
+          width={40}
+          height={40}
+          className="mb-1 h-10 w-10 opacity-80"
+          aria-hidden
+        />
+      )}
       <Loader2 className="h-10 w-10 animate-spin text-gold" aria-hidden />
       <div className="w-full max-w-xs space-y-3">
         <p className="text-sm font-semibold text-foreground">{message}</p>
@@ -77,8 +89,17 @@ export function ActionOverlay({
       aria-live="polite"
       aria-label={message}
     >
-      <div className="w-full max-w-sm rounded-2xl border border-gold/25 bg-card p-6 shadow-card">
-        <LoadingState message={message} detail={detail} variant="card" className="border-0 p-0 shadow-none" />
+      <div className="w-full max-w-sm rounded-2xl border border-gold/25 bg-card p-6 shadow-gold">
+        <Loader2 className="mx-auto h-10 w-10 animate-spin text-gold" aria-hidden />
+        <p className="mt-4 text-center text-sm font-semibold text-foreground">{message}</p>
+        {detail && (
+          <p className="mt-2 text-center text-xs leading-relaxed text-muted-foreground">
+            {detail}
+          </p>
+        )}
+        <div className="mt-4">
+          <IndeterminateBar />
+        </div>
       </div>
     </div>
   );
@@ -87,10 +108,10 @@ export function ActionOverlay({
 export function PageSkeleton({ lines = 3 }: { lines?: number }) {
   return (
     <div className="animate-pulse space-y-4" aria-hidden>
-      <div className="h-8 w-2/3 rounded-lg bg-muted" />
+      <div className="h-8 w-2/3 rounded-lg bg-gold-soft/50" />
       <div className="h-4 w-full rounded bg-muted/80" />
       {Array.from({ length: lines }).map((_, i) => (
-        <div key={i} className="h-24 rounded-2xl bg-muted/60" />
+        <div key={i} className="h-24 rounded-2xl bg-gold-soft/30" />
       ))}
     </div>
   );

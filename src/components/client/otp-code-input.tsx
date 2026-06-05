@@ -73,7 +73,7 @@ export function OtpCodeInput({
         onChange={(e) => applyDigits(e.target.value)}
       />
 
-      <div className="flex justify-center gap-2 sm:gap-2.5" role="group" aria-label="Code à 6 chiffres">
+      <div className="flex justify-center gap-1.5 sm:gap-2.5" role="group" aria-label="Code à 6 chiffres">
         {digits.map((digit, index) => (
           <input
             key={index}
@@ -88,9 +88,9 @@ export function OtpCodeInput({
             value={digit.trim()}
             aria-label={`Chiffre ${index + 1}`}
             className={cn(
-              "h-14 w-11 rounded-xl border-2 border-border bg-card text-center text-2xl font-bold tracking-widest text-foreground shadow-sm transition-colors sm:h-16 sm:w-12",
+              "h-14 w-12 rounded-xl border-2 border-border bg-card text-center text-2xl font-bold tracking-widest text-foreground shadow-sm transition-colors sm:h-16 sm:w-12",
               "focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30",
-              digit.trim() && "border-gold/50 bg-gold-soft/30"
+              digit.trim() && "border-gold bg-gold-soft/50"
             )}
             onChange={(e) => {
               const d = extractDigits(e.target.value);

@@ -49,26 +49,24 @@ export function SubscribeForm({
       <input type="hidden" name="formulaId" value={formula.formulaId} />
 
       {formula.isHardCapReached ? (
-        <div className="flex gap-3 rounded-xl border border-warning/30 bg-warning/10 p-4 text-sm">
-          <Info className="h-5 w-5 shrink-0 text-warning" />
-          <p>
-            Formule complète — vous serez inscrit sur la{" "}
-            <strong>liste d&apos;attente</strong>.
-          </p>
-        </div>
+        <p className="alert-warning">
+          <Info className="mt-0.5 h-5 w-5 shrink-0" />
+          Formule complète — vous serez inscrit sur la{" "}
+          <strong>liste d&apos;attente</strong>.
+        </p>
       ) : (
-        <div className="rounded-xl bg-gold-soft/60 px-4 py-3 text-sm">
-          <span className="badge-success mr-2">Disponible</span>
+        <p className="alert-info">
+          <span className="badge-success mr-1 shrink-0">Disponible</span>
           {formula.remainingSlots} place{formula.remainingSlots > 1 ? "s" : ""}
-        </div>
+        </p>
       )}
 
       <div className="space-y-4">
-        <div className="space-y-2">
+        <div className="form-field">
           <Label htmlFor="name">Nom complet</Label>
           <Input id="name" name="name" required placeholder="Ex. Marie Nguema" autoComplete="name" />
         </div>
-        <div className="space-y-2">
+        <div className="form-field">
           <Label htmlFor="phone">Numéro WhatsApp</Label>
           <Input
             id="phone"
@@ -101,7 +99,7 @@ export function SubscribeForm({
       </div>
 
       {error && (
-        <p className="rounded-lg bg-danger/10 px-3 py-2 text-sm text-danger" role="alert">
+        <p className="alert-danger" role="alert">
           {error}
         </p>
       )}

@@ -62,14 +62,14 @@ export default function LoginPage() {
             <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-gold-soft">
               <Lock className="h-6 w-6 text-gold-deep" />
             </div>
-            <CardTitle>Connexion équipe</CardTitle>
+            <CardTitle className="font-display">Connexion équipe</CardTitle>
             <CardDescription>
               Staff caisse ou administrateur {VENUE_NAME}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={onSubmit} className="space-y-4">
-              <div className="space-y-2">
+            <form onSubmit={onSubmit} className="form-stack">
+              <div className="form-field">
                 <Label htmlFor="login">Email ou téléphone</Label>
                 <Input
                   id="login"
@@ -79,7 +79,7 @@ export default function LoginPage() {
                   autoComplete="username"
                 />
               </div>
-              <div className="space-y-2">
+              <div className="form-field">
                 <Label htmlFor="password">Mot de passe</Label>
                 <Input
                   id="password"
@@ -90,10 +90,7 @@ export default function LoginPage() {
                 />
               </div>
               {error && (
-                <p
-                  className="rounded-lg bg-danger/10 px-3 py-2 text-sm text-danger"
-                  role="alert"
-                >
+                <p className="alert-danger" role="alert">
                   {error}
                 </p>
               )}

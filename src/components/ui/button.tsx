@@ -9,13 +9,15 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-gold text-black shadow-sm hover:bg-gold-deep hover:shadow-md",
+          "bg-gradient-to-b from-gold to-gold-deep text-black shadow-gold hover:brightness-105 hover:shadow-md",
         secondary:
           "border-2 border-gold-deep bg-transparent text-foreground hover:bg-gold-soft",
         destructive: "bg-danger text-white hover:opacity-90",
         ghost: "hover:bg-gold-soft/80 text-foreground",
         outline:
           "border border-border bg-card hover:border-gold/50 hover:bg-gold-soft/30",
+        waitlist:
+          "border border-warning/40 bg-warning/10 text-warning hover:bg-warning/15",
         staff: "bg-gold text-black hover:bg-gold-deep shadow-soft",
         staffGhost:
           "text-white/80 hover:bg-white/10 hover:text-white",
@@ -24,7 +26,7 @@ const buttonVariants = cva(
       },
       size: {
         default: "min-h-12 px-6 py-3",
-        sm: "min-h-10 rounded-lg px-4 text-xs",
+        sm: "min-h-11 rounded-lg px-4 text-xs",
         lg: "min-h-14 rounded-2xl px-8 text-base",
         icon: "h-12 w-12",
       },

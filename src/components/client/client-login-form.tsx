@@ -109,8 +109,8 @@ export function ClientLoginForm({
         message="Validation du code…"
         detail="Connexion à votre espace client."
       />
-      <form onSubmit={verifyCode} className="space-y-4">
-        <p className="rounded-xl bg-warning/10 px-3 py-3 text-sm text-warning">
+      <form onSubmit={verifyCode} className="form-stack">
+        <p className="alert-warning">
           La connexion automatique a échoué. Saisissez le code affiché dans les
           cases ci-dessous (pas dans WhatsApp).
         </p>
@@ -121,7 +121,7 @@ export function ClientLoginForm({
           <Label>Code à 6 chiffres</Label>
           <OtpCodeInput value={code} onChange={setCode} disabled={loading} />
         </div>
-        {error && <p className="text-sm text-danger">{error}</p>}
+        {error && <p className="alert-danger">{error}</p>}
         <Button
           type="submit"
           className="w-full"
@@ -154,12 +154,12 @@ export function ClientLoginForm({
       message="Vérification de votre numéro…"
       detail="Envoi du code et connexion automatique."
     />
-    <form onSubmit={requestCode} className="space-y-4">
-      <p className="text-sm text-muted-foreground">
+    <form onSubmit={requestCode} className="form-stack">
+      <p className="alert-info">
         <strong>Restez sur cette page.</strong> Après validation, vous serez
         connecté automatiquement — inutile d&apos;ouvrir WhatsApp.
       </p>
-      <div className="space-y-2">
+      <div className="form-field">
         <Label htmlFor="phone">Numéro WhatsApp</Label>
         <Input
           id="phone"
@@ -172,7 +172,7 @@ export function ClientLoginForm({
           autoComplete="tel"
         />
       </div>
-      {error && <p className="text-sm text-danger">{error}</p>}
+      {error && <p className="alert-danger">{error}</p>}
       <Button type="submit" className="w-full" size="lg" disabled={loading}>
         {loading ? "Connexion…" : "Se connecter"}
       </Button>

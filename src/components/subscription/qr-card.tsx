@@ -21,15 +21,15 @@ export function QrCard({
 }: QrCardProps) {
   return (
     <Card className="mx-auto w-full max-w-sm overflow-hidden shadow-card">
-      <CardHeader className="bg-black-deep px-4 py-5 text-center text-white sm:px-6">
+      <CardHeader className="border-b border-gold/30 bg-black-deep px-4 py-5 text-center text-white sm:px-6">
         <CardTitle className="font-display text-lg text-gold sm:text-xl">
           Votre QR JAMILA
         </CardTitle>
         <p className="mt-1 text-sm text-white/80">{clientName}</p>
         <p className="text-xs text-gold sm:text-sm">{formulaName}</p>
       </CardHeader>
-      <CardContent className="flex flex-col items-center gap-4 px-4 py-6 sm:px-6">
-        <div className="relative w-full max-w-[min(100%,280px)] rounded-2xl border-4 border-gold bg-white p-2 shadow-card sm:p-3">
+      <CardContent className="flex flex-col items-center gap-5 px-4 py-6 sm:gap-6 sm:px-6">
+        <div className="relative w-full max-w-[min(100%,280px)] rounded-2xl border-[3px] border-gold/80 bg-white p-2 shadow-card ring-1 ring-gold/30 sm:p-3">
           <Image
             src={qrDataUrl}
             alt="QR Code abonnement"
@@ -39,23 +39,24 @@ export function QrCard({
             unoptimized
             priority
           />
-          <div className="absolute left-1/2 top-1/2 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black-deep text-sm font-bold text-gold sm:h-12 sm:w-12 sm:text-base">
+          <div className="absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-black-deep/90 text-xs font-bold text-gold">
             J
           </div>
         </div>
 
         <div className="w-full text-center">
-          <p className="text-xl font-semibold text-success sm:text-2xl">
-            {mealsRemaining} repas restants
+          <p className="font-display text-2xl font-semibold text-gold-deep sm:text-3xl">
+            {mealsRemaining}
           </p>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground">repas restants</p>
+          <p className="mt-3 inline-flex rounded-xl bg-gold-soft/60 px-3 py-1.5 text-sm text-muted-foreground">
             Code secours :{" "}
-            <strong className="font-mono text-base tracking-wider text-foreground">
+            <strong className="ml-1 font-mono text-base tracking-[0.2em] text-foreground">
               {shortCode}
             </strong>
           </p>
           {expiresAt && (
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="mt-2 text-xs text-muted-foreground">
               Valide jusqu&apos;au{" "}
               {expiresAt.toLocaleDateString("fr-FR", {
                 day: "numeric",

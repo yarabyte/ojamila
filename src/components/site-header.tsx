@@ -53,7 +53,7 @@ export async function SiteHeader({
             alt={VENUE_NAME}
             width={40}
             height={40}
-            className="hidden rounded-full ring-1 ring-gold/50 sm:block sm:h-11 sm:w-11"
+            className="h-9 w-9 shrink-0 rounded-full ring-1 ring-gold/50 sm:h-11 sm:w-11"
             priority
           />
           <div className="min-w-0">
@@ -66,14 +66,15 @@ export async function SiteHeader({
           </div>
         </Link>
 
-        <nav className="hidden items-center gap-5 lg:flex">
+        <nav className="hidden items-center gap-5 md:flex">
           {publicLinks.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
               className={cn(
                 "text-sm font-semibold text-white/85 transition-colors hover:text-gold",
-                isLinkActive(href, activePath) && "text-gold"
+                isLinkActive(href, activePath) &&
+                  "border-b-2 border-gold pb-0.5 text-gold"
               )}
             >
               {label}

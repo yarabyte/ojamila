@@ -19,7 +19,7 @@ export function PageHeader({
         <div>
           <h1
             className={cn(
-              "text-2xl font-semibold sm:text-3xl",
+              "font-display text-2xl font-semibold tracking-tight sm:text-3xl",
               dark ? "text-gold" : "text-foreground"
             )}
           >

@@ -17,8 +17,8 @@ export default async function CguPage() {
           title="Conditions Générales"
           description={`Version ${settings.cguVersion} — ${VENUE_NAME} Abonnements`}
         />
-        <article className="card-elevated mt-8 max-w-none p-6 sm:p-8">
-          <div className="prose prose-sm max-w-none whitespace-pre-wrap leading-relaxed text-foreground">
+        <article className="card-elevated mt-8 max-w-none border-t-2 border-t-gold/30 p-6 sm:p-8">
+          <div className="max-w-none whitespace-pre-wrap text-sm leading-relaxed text-foreground sm:text-[0.9375rem] sm:leading-7">
             {settings.cguText}
           </div>
         </article>

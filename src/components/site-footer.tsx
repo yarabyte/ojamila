@@ -7,7 +7,7 @@ export function SiteFooter({ className }: { className?: string }) {
   return (
     <footer
       className={cn(
-        "mt-auto border-t border-gold/20 bg-black-deep text-white",
+        "mt-auto border-t border-gold/30 bg-black-deep text-white",
         className
       )}
     >
@@ -32,22 +32,23 @@ export function SiteFooter({ className }: { className?: string }) {
         </div>
 
         <div className="mt-10 flex flex-col gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <nav className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-white/70">
-            <Link href="/formules" className="hover:text-gold">
-              Formules
-            </Link>
-            <Link href="/client" className="hover:text-gold">
-              Espace client
-            </Link>
-            <Link href="/cgu" className="hover:text-gold">
-              CGU
-            </Link>
-            <Link href="/staff" className="hover:text-gold">
-              Caisse
-            </Link>
-            <Link href="/login" className="hover:text-gold">
-              Admin
-            </Link>
+          <nav className="flex flex-wrap gap-x-2 gap-y-1 text-sm text-white/70">
+            {[
+              { href: "/", label: "Accueil" },
+              { href: "/formules", label: "Formules" },
+              { href: "/client", label: "Espace client" },
+              { href: "/cgu", label: "CGU" },
+              { href: "/staff", label: "Caisse" },
+              { href: "/login", label: "Admin" },
+            ].map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className="inline-flex min-h-11 items-center rounded-lg px-2 transition-colors duration-200 hover:text-gold"
+              >
+                {label}
+              </Link>
+            ))}
           </nav>
           <p className="text-xs text-white/45">
             © {new Date().getFullYear()} {VENUE_NAME}

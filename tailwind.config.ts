@@ -60,9 +60,11 @@ const config: Config = {
       boxShadow: {
         soft: "0 4px 24px -4px rgba(35, 31, 32, 0.12)",
         card: "0 8px 32px -8px rgba(35, 31, 32, 0.15)",
+        gold: "0 4px 24px rgba(214, 203, 114, 0.28)",
       },
       animation: {
-        "fade-in": "fadeIn 0.35s ease-out",
+        "fade-in": "fadeIn 0.45s ease-out",
+        "scale-in": "scaleIn 0.55s cubic-bezier(0.22, 1, 0.36, 1)",
       },
       keyframes: {
         fadeIn: {

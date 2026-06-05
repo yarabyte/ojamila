@@ -73,7 +73,7 @@ Sinon, un simple `db:deploy` + `db:seed` sur une base Supabase vide suffit.
 
 | Erreur | Solution |
 |--------|----------|
-| `Can't reach database server` | Vérifier mot de passe, IP allowlist (Supabase : *Allow all* en dev) |
+| `Can't reach database server` (P1001) | Vérifier mot de passe, IP allowlist (Supabase : *Allow all* en dev). Si le réseau est lent, ajouter `?connect_timeout=30` à `DIRECT_URL` (et `DATABASE_URL`). Réessayez : la base Supabase peut mettre ~10–30 s à répondre après une pause. |
 | `prepared statement already exists` | Ajouter `?pgbouncer=true` à `DATABASE_URL` |
 | `Unknown argument` Prisma | `npx prisma generate` puis redémarrer le serveur |
 | Trop de connexions sur Vercel | Utiliser le pooler (`6543`), pas le port direct pour `DATABASE_URL` |

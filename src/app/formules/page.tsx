@@ -54,9 +54,9 @@ export default async function FormulesPage() {
           </div>
         </section>
 
-        <section className="page-main">
+        <section className="page-main bg-gradient-to-b from-gold-soft/20 to-background">
           <div className="mb-8">
-            <h2 className="font-display text-2xl font-semibold">
+            <h2 className="section-title">
               Choisissez votre formule
             </h2>
             <p className="mt-1 text-muted-foreground">
@@ -72,7 +72,7 @@ export default async function FormulesPage() {
               </p>
             </div>
           ) : (
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="grid gap-6 sm:grid-cols-2">
               {formulas.map((f) => (
                 <FormulaCard key={f.formulaId} formula={f} />
               ))}

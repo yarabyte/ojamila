@@ -30,13 +30,13 @@ export async function ClientQrView({
       )}
 
       {sub.status === SubscriptionStatus.PENDING_PAYMENT && (
-        <div className="rounded-2xl border border-gold/30 bg-gold-soft/80 p-4 text-sm">
+        <div className="alert-info">
           Présentez-vous à la caisse pour payer en espèces et activer votre QR.
         </div>
       )}
 
       {sub.status === SubscriptionStatus.WAITLIST && (
-        <div className="rounded-2xl border border-warning/30 bg-warning/10 p-4 text-sm text-warning">
+        <div className="alert-warning">
           Liste d&apos;attente — position {sub.waitlistPosition}
         </div>
       )}

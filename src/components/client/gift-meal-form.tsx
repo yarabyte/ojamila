@@ -90,8 +90,8 @@ export function GiftMealForm({
       />
 
       {success ? (
-        <div className="space-y-3 rounded-xl border border-success/30 bg-success/10 p-4 text-sm">
-          <p className="font-medium text-success">
+        <div className="alert-success flex-col items-start gap-2">
+          <p className="font-medium">
             {success.autoSent
               ? "Repas offert envoyé sur WhatsApp !"
               : "Repas offert créé — envoyez-le au destinataire."}
@@ -117,13 +117,13 @@ export function GiftMealForm({
           </Button>
         </div>
       ) : (
-        <form onSubmit={onSubmit} className="space-y-4">
+        <form onSubmit={onSubmit} className="form-stack">
           <p className="text-sm text-muted-foreground">
             Offrez un repas à un proche : un QR à usage unique sera envoyé sur
             son WhatsApp. Le repas sera déduit de votre solde à la validation en
             caisse.
           </p>
-          <div className="space-y-2">
+          <div className="form-field">
             <Label htmlFor="gift-phone">WhatsApp du destinataire</Label>
             <div className="flex gap-2">
               <Input
@@ -142,7 +142,8 @@ export function GiftMealForm({
                 <Button
                   type="button"
                   variant="outline"
-                  className="shrink-0 gap-1.5 px-3"
+                  className="min-h-12 min-w-12 shrink-0 px-0"
+                  size="icon"
                   onClick={pickContact}
                   disabled={loading || pickingContact}
                   aria-label="Choisir dans les contacts"
@@ -159,11 +160,11 @@ export function GiftMealForm({
             </p>
           </div>
           {error && (
-            <p className="text-sm text-danger" role="alert">
+            <p className="alert-danger" role="alert">
               {error}
             </p>
           )}
-          <Button type="submit" className="w-full gap-2" disabled={loading}>
+          <Button type="submit" className="w-full gap-2" size="lg" disabled={loading}>
             <Gift className="h-4 w-4" />
             {loading ? "Envoi…" : "Offrir un repas"}
           </Button>
