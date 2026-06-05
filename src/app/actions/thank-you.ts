@@ -119,7 +119,7 @@ export async function sendThankYouBatchAction(
     await requireRole(["ADMIN"]);
     const result = await sendThankYouBatch({ offset, limit });
 
-    let campaignComplete = !result.hasMore;
+    const campaignComplete = !result.hasMore;
     if (campaignComplete) {
       await recordThankYouCampaign(campaignSentSoFar + result.sent);
       revalidatePath("/admin/thank-you");
