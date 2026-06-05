@@ -27,7 +27,7 @@ export default async function CguPage() {
             <Link href="/">Voir les formules</Link>
           </Button>
           <Button variant="secondary" asChild>
-            <Link href="/client">Mon espace</Link>
+            <Link href="/client/qr">Mon QR</Link>
           </Button>
         </div>
       </main>

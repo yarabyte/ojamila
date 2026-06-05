@@ -26,7 +26,7 @@ export default async function SubscribePage({
 
   return (
     <div className="flex min-h-screen flex-col">
-      <SiteHeader />
+      <SiteHeader activePath="/" />
       <main className="page-main flex-1">
         <Button variant="ghost" asChild className="-ml-2 mb-2">
           <Link href="/" className="gap-1 text-muted-foreground">

@@ -75,7 +75,7 @@ async function main() {
       cguText: DEFAULT_CGU,
       cguVersion: "1.0",
       whatsappMessageTemplate:
-        "Bonjour {{name}} ! Votre abonnement JAMILA est prêt. Consultez votre QR ici : {{qrLink}} — Code secours : {{shortCode}}",
+        "Bonjour {{name}} ! Votre abonnement JAMILA est prêt. Consultez votre QR ici : {{qrLink}} — Code secours : {{shortCode}}. Conservez-le bien, vous en aurez besoin pour valider vos repas.",
       dailyMealLimitDefault: 1,
       validityDaysDefault: 180,
       fundraisingGoalFcfa: 10_000_000,

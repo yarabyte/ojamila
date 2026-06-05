@@ -3,7 +3,7 @@
   "name": "Ô JAMILA — Abonnements repas",
   "short_name": "Ô JAMILA",
   "description": "Abonnements repas buffet — Ô JAMILA, Bonapriso, Douala",
-  "start_url": "/?source=pwa",
+  "start_url": "/client/qr?source=pwa",
   "scope": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
@@ -41,9 +41,16 @@
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {
+      "name": "Mon QR",
+      "short_name": "Mon QR",
+      "description": "Afficher mon QR repas",
+      "url": "/client/qr?source=shortcut",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
       "name": "Mon espace",
       "short_name": "Espace client",
-      "description": "Accéder à mon abonnement",
+      "description": "Mes abonnements",
       "url": "/client?source=shortcut",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },

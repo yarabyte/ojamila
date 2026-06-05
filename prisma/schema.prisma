@@ -121,7 +121,7 @@ model AppSettings {
   id                      String @id @default("singleton")
   dailyMealLimitDefault   Int    @default(1)
   validityDaysDefault     Int    @default(180)
-  whatsappMessageTemplate String @default("Bonjour {{name}}, voici votre QR code abonnement JAMILA : {{qrLink}}")
+  whatsappMessageTemplate String @default("Bonjour {{name}} ! Votre abonnement JAMILA est prêt. Consultez votre QR ici : {{qrLink}} — Code secours : {{shortCode}}. Conservez-le bien, vous en aurez besoin pour valider vos repas.")
   cguText                 String @db.Text
   cguVersion              String @default("1.0")
   fundraisingGoalFcfa     Int    @default(10000000)

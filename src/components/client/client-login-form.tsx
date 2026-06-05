@@ -8,7 +8,11 @@ import { Label } from "@/components/ui/label";
 
 type Step = "phone" | "code";
 
-export function ClientLoginForm() {
+export function ClientLoginForm({
+  redirectTo = "/client/qr",
+}: {
+  redirectTo?: string;
+}) {
   const router = useRouter();
   const [step, setStep] = useState<Step>("phone");
   const [phone, setPhone] = useState("");
@@ -62,6 +66,7 @@ export function ClientLoginForm() {
         setError(data.error ?? "Code invalide");
         return;
       }
+      router.push(data.redirectTo ?? redirectTo);
       router.refresh();
     } finally {
       setLoading(false);

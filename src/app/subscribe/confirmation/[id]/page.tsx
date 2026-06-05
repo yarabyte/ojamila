@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,6 +14,7 @@ import { subscriptionService } from "@/lib/services";
 import { VENUE_NAME } from "@/lib/venue";
 import { SubscriptionStatus } from "@prisma/client";
 import { WhatsAppButton } from "@/components/subscription/whatsapp-button";
+import { QrCode } from "lucide-react";
 
 export default async function ConfirmationPage({
   params,
@@ -24,12 +26,13 @@ export default async function ConfirmationPage({
 
   const isWaitlist = sub.status === SubscriptionStatus.WAITLIST;
   const isPending = sub.status === SubscriptionStatus.PENDING_PAYMENT;
+  const isActive = sub.status === SubscriptionStatus.ACTIVE;
 
   return (
-    <div className="min-h-screen bg-background">
-      <SiteHeader />
-      <main className="mx-auto max-w-md px-4 py-8">
-        <Card>
+    <div className="flex min-h-screen min-h-[100dvh] flex-col">
+      <SiteHeader activePath="/client" />
+      <main className="page-main flex-1">
+        <Card className="mx-auto w-full max-w-md shadow-card">
           <CardHeader>
             <CardTitle className="text-success">
               {isWaitlist
@@ -53,32 +56,42 @@ export default async function ConfirmationPage({
               <p className="rounded-xl bg-gold-soft p-4 text-sm">
                 <strong>Prochaine étape :</strong> présentez-vous à la caisse
                 d&apos;{VENUE_NAME} pour régler{" "}
-                <strong>{sub.formula.priceFcfa.toLocaleString("fr-FR")} FCFA</strong>{" "}
+                <strong>
+                  {sub.formula.priceFcfa.toLocaleString("fr-FR")} FCFA
+                </strong>{" "}
                 en espèces et activer votre abonnement.
               </p>
             )}
-            {sub.status === SubscriptionStatus.ACTIVE && (
-              <p className="text-sm text-muted-foreground">
-                Votre abonnement est actif. Consultez votre QR dans votre espace
-                client.
+            {isActive && (
+              <p className="rounded-xl bg-success/10 p-4 text-sm text-success">
+                Votre abonnement est actif. Votre QR est disponible à tout moment
+                dans l&apos;application.
               </p>
             )}
             <div className="flex flex-col gap-2">
-              <Button asChild>
-                <Link href={`/client/subscription/${sub.id}`}>
-                  Voir mon abonnement
-                </Link>
-              </Button>
-              {sub.status === SubscriptionStatus.ACTIVE && (
-                <WhatsAppButton subscriptionId={sub.id} />
+              {isActive ? (
+                <Button asChild className="w-full gap-2" size="lg">
+                  <Link href="/client/qr">
+                    <QrCode className="h-5 w-5" />
+                    Voir mon QR
+                  </Link>
+                </Button>
+              ) : (
+                <Button asChild className="w-full" size="lg">
+                  <Link href={`/client/subscription/${sub.id}`}>
+                    Suivre mon abonnement
+                  </Link>
+                </Button>
               )}
-              <Button variant="secondary" asChild>
+              {isActive && <WhatsAppButton subscriptionId={sub.id} />}
+              <Button variant="secondary" asChild className="w-full">
                 <Link href="/">Accueil</Link>
               </Button>
             </div>
           </CardContent>
         </Card>
       </main>
+      <SiteFooter />
     </div>
   );
 }

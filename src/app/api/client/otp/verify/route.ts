@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { z } from "zod";
 import { COOKIE_NAME, signClientPhone } from "@/lib/client-session";
+import { getClientQrRedirectPath } from "@/lib/client-subscription";
 import { AppError } from "@/lib/errors";
 import { otpService } from "@/lib/services";
 
@@ -33,7 +34,8 @@ export async function POST(req: Request) {
       path: "/",
     });
 
-    return NextResponse.json({ success: true });
+    const redirectTo = await getClientQrRedirectPath(phone);
+    return NextResponse.json({ success: true, redirectTo });
   } catch (e) {
     if (e instanceof AppError) {
       return NextResponse.json(

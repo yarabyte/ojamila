@@ -38,7 +38,7 @@ export default async function StaffSubscribeDonePage({
             </p>
             <WhatsAppButton subscriptionId={sub.id} />
             <Button asChild variant="secondary" className="w-full">
-              <Link href={`/client/subscription/${sub.id}`}>Voir le QR</Link>
+              <Link href="/client/qr">Voir le QR client</Link>
             </Button>
           </>
         )}

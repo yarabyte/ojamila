@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 
 const publicLinks = [
   { href: "/", label: "Formules" },
+  { href: "/client/qr", label: "Mon QR" },
   { href: "/client", label: "Mon espace" },
   { href: "/cgu", label: "CGU" },
 ];

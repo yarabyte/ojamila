@@ -81,6 +81,19 @@
     padding-bottom: max(5rem, env(safe-area-inset-bottom));
   }
 
+  .client-shell {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .client-page-main {
+    @apply container-app py-4 sm:py-6;
+  }
+
+  .safe-bottom-nav {
+    padding-bottom: max(5.5rem, calc(env(safe-area-inset-bottom) + 4.5rem));
+  }
+
   .staff-shell {
     min-height: 100vh;
     background-color: #fbfaed;
