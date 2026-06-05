@@ -19,6 +19,7 @@ export async function resetPilotData(): Promise<{
   }
 
   return prisma.$transaction(async (tx) => {
+    await tx.mealGift.deleteMany();
     const consumptions = await tx.consumption.deleteMany();
     const subscriptions = await tx.subscription.deleteMany();
     await tx.otpChallenge.deleteMany();

@@ -28,7 +28,7 @@ export function ResetTestDataButton({
   async function reset() {
     const confirmed = window.confirm(
       "Réinitialiser toutes les données de test ?\n\n" +
-        "Seront supprimés : abonnements, consommations, clients et codes OTP.\n" +
+        "Seront supprimés : abonnements, repas offerts, consommations, clients et codes OTP.\n" +
         "Formules, staff et admin seront conservés.\n\n" +
         "Cette action est irréversible."
     );
