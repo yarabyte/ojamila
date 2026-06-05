@@ -1,8 +1,7 @@
-import Link from "next/link";
+import { AdminSubscriptionsList } from "@/components/admin/admin-subscriptions-list";
 import { prisma } from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { subscriptionService } from "@/lib/services";
 
 export default async function AdminSubscriptionsPage({
   searchParams,
@@ -35,24 +34,29 @@ export default async function AdminSubscriptionsPage({
 
   return (
     <div className="space-y-6 pb-16">
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <h1 className="font-display text-2xl font-semibold">Abonnements</h1>
-        <Button variant="secondary" asChild>
+        <Button variant="secondary" asChild className="w-full sm:w-auto">
           <a href="/api/admin/subscriptions/export">Export CSV</a>
         </Button>
       </div>
 
-      <form method="get" className="flex flex-wrap gap-2">
-        <Input
-          name="q"
-          placeholder="Rechercher nom / téléphone"
-          defaultValue={searchParams.q}
-          className="max-w-xs"
-        />
+      <form
+        method="get"
+        className="grid gap-3 rounded-2xl border border-border bg-card p-4 sm:grid-cols-2 lg:flex lg:flex-wrap lg:items-end lg:gap-2 lg:border-0 lg:bg-transparent lg:p-0"
+      >
+        <div className="sm:col-span-2 lg:max-w-xs lg:flex-1">
+          <Input
+            name="q"
+            placeholder="Rechercher nom / téléphone"
+            defaultValue={searchParams.q}
+            className="w-full"
+          />
+        </div>
         <select
           name="status"
           defaultValue={searchParams.status ?? ""}
-          className="h-12 rounded-xl border px-3 text-sm"
+          className="h-12 w-full rounded-xl border border-input bg-card px-3 text-sm"
         >
           <option value="">Tous statuts</option>
           <option value="ACTIVE">Actif</option>
@@ -64,7 +68,7 @@ export default async function AdminSubscriptionsPage({
         <select
           name="formulaId"
           defaultValue={searchParams.formulaId ?? ""}
-          className="h-12 rounded-xl border px-3 text-sm"
+          className="h-12 w-full rounded-xl border border-input bg-card px-3 text-sm lg:max-w-[12rem]"
         >
           <option value="">Toutes formules</option>
           {formulas.map((f) => (
@@ -73,45 +77,12 @@ export default async function AdminSubscriptionsPage({
             </option>
           ))}
         </select>
-        <Button type="submit">Filtrer</Button>
+        <Button type="submit" className="w-full sm:col-span-2 lg:w-auto">
+          Filtrer
+        </Button>
       </form>
 
-      <div className="overflow-x-auto rounded-xl border">
-        <table className="w-full text-sm">
-          <thead className="bg-gold-soft/40 text-left">
-            <tr>
-              <th className="p-3">Client</th>
-              <th className="p-3">Formule</th>
-              <th className="p-3">Statut</th>
-              <th className="p-3">Repas</th>
-              <th className="p-3"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {subs.map((s) => (
-              <tr key={s.id} className="border-t">
-                <td className="p-3">
-                  <p className="font-medium">{s.client.name}</p>
-                  <p className="text-xs text-muted-foreground">{s.client.phone}</p>
-                </td>
-                <td className="p-3">{s.formula.name}</td>
-                <td className="p-3">{s.status}</td>
-                <td className="p-3">
-                  {subscriptionService.mealsRemaining(s)} / {s.totalMeals}
-                </td>
-                <td className="p-3">
-                  <Link
-                    href={`/admin/subscriptions/${s.id}`}
-                    className="text-gold-deep underline"
-                  >
-                    Détail
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <AdminSubscriptionsList subs={subs} />
     </div>
   );
 }
