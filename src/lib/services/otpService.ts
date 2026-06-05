@@ -19,8 +19,8 @@ export class OtpService {
   async requestLoginOtp(phone: string): Promise<{
     whatsappUrl?: string;
     autoSent?: boolean;
-    /** Uniquement en développement pour tests sans WhatsApp */
-    devCode?: string;
+    /** Rempli dans l'app quand l'envoi WhatsApp API a réussi (évite copier-coller) */
+    code?: string;
   }> {
     const normalized = normalizePhone(phone);
 
@@ -59,11 +59,13 @@ export class OtpService {
 
     const delivery = await whatsappService.sendOtpCode(normalized, code);
 
+    if (delivery.sent) {
+      return { autoSent: true, code };
+    }
+
     return {
-      ...(delivery.sent
-        ? { autoSent: true }
-        : { whatsappUrl: delivery.link }),
-      ...(process.env.NODE_ENV === "development" ? { devCode: code } : {}),
+      whatsappUrl: delivery.link,
+      ...(process.env.NODE_ENV === "development" ? { code } : {}),
     };
   }
 
