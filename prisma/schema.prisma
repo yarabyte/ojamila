@@ -154,7 +154,7 @@ model AppSettings {
   cguVersion              String @default("1.0")
   fundraisingGoalFcfa     Int    @default(10000000)
   testPeriodEndsAt        DateTime?
-  thankYouMessageTemplate String @default("Merci {{name}} pour votre confiance et votre participation à JAMILA !\nRetrouvez les photos de l'événement ici : {{driveLink}}")
+  thankYouMessageTemplate String @default("Merci {{name}} pour votre confiance et votre participation à la soirée des partenaires du 4 juin 2026.\n\nVous avez souscrit à la formule {{formulaName}}. Grâce à vous, nous allons continuer à vous offrir des moments exceptionnels chez Ô JAMILA.\n\nRetrouvez les photos de l'événement ici : {{driveLink}}")
   thankYouDriveUrl        String @default("")
   thankYouLastSentAt      DateTime?
   thankYouLastSentCount   Int?
