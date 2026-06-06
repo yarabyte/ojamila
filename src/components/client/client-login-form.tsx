@@ -166,7 +166,7 @@ export function ClientLoginForm({
           name="phone"
           type="tel"
           required
-          placeholder="6XX XXX XXX"
+          placeholder="+237 6XX XXX XXX ou +33…"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           autoComplete="tel"

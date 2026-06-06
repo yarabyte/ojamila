@@ -111,6 +111,35 @@ export class SubscriptionService {
     );
   }
 
+  private async assertPhoneAvailableForSubscription(
+    tx: Prisma.TransactionClient,
+    phone: string
+  ): Promise<void> {
+    const normalizedPhone = normalizePhone(phone);
+    const existing = await tx.subscription.findFirst({
+      where: {
+        client: { phone: normalizedPhone },
+        status: {
+          in: [
+            SubscriptionStatus.PENDING_PAYMENT,
+            SubscriptionStatus.ACTIVE,
+            SubscriptionStatus.WAITLIST,
+            SubscriptionStatus.EXPIRED,
+          ],
+        },
+      },
+      select: { id: true },
+    });
+
+    if (existing) {
+      throw new AppError(
+        "Ce numéro WhatsApp est déjà inscrit. Connectez-vous à votre espace client ou contactez la caisse.",
+        ErrorCodes.PHONE_ALREADY_SUBSCRIBED,
+        409
+      );
+    }
+  }
+
   private async resolveClient(
     tx: Prisma.TransactionClient,
     name: string,
@@ -209,6 +238,8 @@ export class SubscriptionService {
       const activeCount = await countActiveSubscriptions(formula.id, tx);
       const hardCapReached = activeCount >= formula.hardCap;
 
+      await this.assertPhoneAvailableForSubscription(tx, input.phone);
+
       const client = await this.resolveClient(
         tx,
         input.name,
@@ -264,6 +295,8 @@ export class SubscriptionService {
 
       const activeCount = await countActiveSubscriptions(formula.id, tx);
       const hardCapReached = activeCount >= formula.hardCap;
+
+      await this.assertPhoneAvailableForSubscription(tx, input.phone);
 
       const client = await this.resolveClient(
         tx,

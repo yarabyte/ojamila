@@ -1,9 +1,7 @@
 import { z } from "zod";
+import { phoneSchema } from "@/lib/phone";
 
-export const phoneSchema = z
-  .string()
-  .min(8, "Numéro WhatsApp invalide")
-  .max(20);
+export { phoneSchema };
 
 export const selfServiceSubscriptionSchema = z.object({
   formulaId: z.string().min(1),

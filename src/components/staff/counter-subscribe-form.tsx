@@ -82,7 +82,17 @@ export function CounterSubscribeForm({
       </div>
       <div className="space-y-2">
         <Label htmlFor="phone">WhatsApp</Label>
-        <Input id="phone" name="phone" type="tel" required className="bg-card text-black" />
+        <Input
+          id="phone"
+          name="phone"
+          type="tel"
+          required
+          placeholder="+237 6XX XXX XXX ou +33…"
+          className="bg-card text-black"
+        />
+        <p className="text-xs text-muted-foreground">
+          Format international (+237…, +33…, +1…). Un seul abonnement par numéro.
+        </p>
       </div>
 
       <div className="flex items-start gap-3">

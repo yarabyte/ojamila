@@ -5,6 +5,7 @@ import { getClientPhoneFromCookies } from "@/lib/client-session";
 import { AppError } from "@/lib/errors";
 import { giftService, whatsappService } from "@/lib/services";
 import { generateQrPngBuffer } from "@/lib/qr-display";
+import { phoneSchema } from "@/lib/phone";
 import { z } from "zod";
 
 export type ActionResult<T = void> =
@@ -13,7 +14,7 @@ export type ActionResult<T = void> =
 
 const createGiftSchema = z.object({
   subscriptionId: z.string().cuid(),
-  recipientPhone: z.string().min(8, "Numéro WhatsApp requis"),
+  recipientPhone: phoneSchema,
 });
 
 export async function createMealGift(

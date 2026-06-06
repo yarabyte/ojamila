@@ -132,7 +132,7 @@ export function GiftMealForm({
                 type="tel"
                 inputMode="tel"
                 required
-                placeholder="6XX XXX XXX"
+                placeholder="+237 6XX XXX XXX ou +33…"
                 value={recipientPhone}
                 onChange={(e) => setRecipientPhone(e.target.value)}
                 autoComplete="tel"
@@ -155,8 +155,8 @@ export function GiftMealForm({
             </div>
             <p className="text-xs text-muted-foreground">
               {contactsAvailable
-                ? "Choisissez un contact ou saisissez le numéro WhatsApp."
-                : "Saisissez le numéro WhatsApp (sur iPhone, collez depuis vos contacts si besoin)."}
+                ? "Choisissez un contact ou saisissez le numéro au format international (+237…, +33…)."
+                : "Format international (+237…, +33…, +1…). Sur iPhone, collez depuis vos contacts si besoin."}
             </p>
           </div>
           {error && (

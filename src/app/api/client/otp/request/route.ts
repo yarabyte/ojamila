@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { AppError } from "@/lib/errors";
+import { phoneSchema } from "@/lib/phone";
 import { otpService } from "@/lib/services";
 
-const schema = z.object({ phone: z.string().min(8) });
+const schema = z.object({ phone: phoneSchema });
 
 export async function POST(req: Request) {
   try {

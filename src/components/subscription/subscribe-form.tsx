@@ -73,9 +73,12 @@ export function SubscribeForm({
             name="phone"
             type="tel"
             required
-            placeholder="6XX XXX XXX"
+            placeholder="+237 6XX XXX XXX ou +33 6 XX XX XX XX"
             autoComplete="tel"
           />
+          <p className="text-xs text-muted-foreground">
+            Format international (+237…, +33…, +1…). Un seul abonnement par numéro.
+          </p>
         </div>
       </div>
 

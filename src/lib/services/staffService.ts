@@ -2,11 +2,12 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
 import { AppError } from "@/lib/errors";
 import { normalizePhone } from "@/lib/phone";
+import { phoneSchema } from "@/lib/phone";
 import { z } from "zod";
 
 export const createStaffSchema = z.object({
   name: z.string().min(2).max(100),
-  phone: z.string().min(8),
+  phone: phoneSchema,
   email: z.string().email().optional().or(z.literal("")),
   password: z.string().min(6),
 });
