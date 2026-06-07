@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { VENUE_NAME } from "@/lib/venue";
 import { ActionOverlay } from "@/components/ui/loading-state";
@@ -81,10 +82,9 @@ export default function LoginPage() {
               </div>
               <div className="form-field">
                 <Label htmlFor="password">Mot de passe</Label>
-                <Input
+                <PasswordInput
                   id="password"
                   name="password"
-                  type="password"
                   required
                   autoComplete="current-password"
                 />

@@ -4,6 +4,7 @@ import {
 } from "@/app/actions/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { staffService } from "@/lib/services";
@@ -35,7 +36,7 @@ export default async function AdminStaffPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Mot de passe</Label>
-              <Input id="password" name="password" type="password" required minLength={6} />
+              <PasswordInput id="password" name="password" required minLength={6} />
             </div>
             <Button type="submit">Créer</Button>
           </form>
