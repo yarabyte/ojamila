@@ -64,19 +64,28 @@ export class PushService {
   }
 
   async sendToAdmins(payload: PushPayload) {
+    return this.sendToStaffAndAdmins(payload);
+  }
+
+  async sendToStaffAndAdmins(payload: PushPayload) {
     if (!ensureVapid()) return { sent: 0 };
 
-    const admins = await prisma.user.findMany({
-      where: { role: "ADMIN", active: true },
+    const users = await prisma.user.findMany({
+      where: { role: { in: ["ADMIN", "STAFF"] }, active: true },
       select: { id: true },
     });
 
     let sent = 0;
-    for (const admin of admins) {
-      const result = await this.sendToUser(admin.id, payload);
+    for (const user of users) {
+      const result = await this.sendToUser(user.id, payload);
       sent += result.sent;
     }
     return { sent };
+  }
+
+  async hasSubscription(userId: string): Promise<boolean> {
+    const count = await prisma.pushSubscription.count({ where: { userId } });
+    return count > 0;
   }
 
   private async sendToEndpoints(

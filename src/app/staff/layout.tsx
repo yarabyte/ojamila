@@ -52,7 +52,7 @@ export default async function StaffLayout({
           <div className="flex items-center gap-1">
             <PushSubscribeButton />
             <Link
-              href="/api/auth/signout"
+              href="/logout?callbackUrl=/login"
               className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-gold-soft hover:text-foreground"
               aria-label="Déconnexion"
             >

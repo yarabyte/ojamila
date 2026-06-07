@@ -12,6 +12,10 @@ export { otpService, OtpService } from "./otpService";
 export { pushService, PushService, getVapidPublicKey } from "./pushService";
 export type { PushPayload } from "./pushService";
 export {
+  notifyStaffNewSubscription,
+  notifyClientWaitlistPromotion,
+} from "./eventNotificationService";
+export {
   resetPilotData,
   isTestPeriodOver,
 } from "./resetService";

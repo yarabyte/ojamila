@@ -3,6 +3,7 @@ import { SubscriptionStatus } from "@prisma/client";
 import { getServerAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { DashboardLinkGrid, type DashboardLink } from "@/components/dashboard/link-grid";
+import { PushSubscribeButton } from "@/components/staff/push-subscribe-button";
 import { StaffDashboardHero } from "@/components/staff/staff-dashboard-hero";
 import { StaffSection } from "@/components/staff/staff-section";
 import { StaffStatRow } from "@/components/staff/staff-stat-row";
@@ -160,6 +161,10 @@ export default async function StaffDashboardPage() {
           },
         ]}
       />
+
+      <StaffSection title="Notifications" subtitle="Restez informé en caisse">
+        <PushSubscribeButton variant="card" />
+      </StaffSection>
 
       <StaffSection title="Caisse & service" subtitle="Actions du jour">
         <DashboardLinkGrid links={staffLinks} />

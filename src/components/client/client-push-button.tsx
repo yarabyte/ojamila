@@ -1,34 +1,66 @@
 "use client";
 
-import { useState } from "react";
-import { subscribeToPush } from "@/lib/push-client";
+import { useEffect, useState } from "react";
+import { getPushStatus, subscribeToPush } from "@/lib/push-client";
 import { Button } from "@/components/ui/button";
-import { Bell, BellOff } from "lucide-react";
+import { Bell, BellOff, BellRing } from "lucide-react";
 
 export function ClientPushButton() {
   const [status, setStatus] = useState<
-    "idle" | "ok" | "unsupported" | "denied" | "unconfigured"
-  >("idle");
+    "loading" | "ok" | "ready" | "unsupported" | "denied" | "unconfigured"
+  >("loading");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const pushStatus = await getPushStatus();
+      if (cancelled) return;
+
+      if (!pushStatus.configured) {
+        setStatus("unconfigured");
+        return;
+      }
+
+      if (pushStatus.subscribed && pushStatus.browserGranted) {
+        setStatus("ok");
+        return;
+      }
+
+      if (
+        typeof Notification !== "undefined" &&
+        Notification.permission === "denied"
+      ) {
+        setStatus("denied");
+        return;
+      }
+
+      setStatus("ready");
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function enable() {
     setLoading(true);
     const result = await subscribeToPush();
-    setStatus(result);
+    setStatus(result === "ok" ? "ok" : result);
     setLoading(false);
+  }
+
+  if (status === "loading" || status === "unconfigured") {
+    return null;
   }
 
   if (status === "ok") {
     return (
       <p className="flex items-center gap-2 text-xs text-success">
-        <Bell className="h-3 w-3" />
+        <BellRing className="h-3 w-3" />
         Alertes activées (promotion liste d&apos;attente)
       </p>
     );
-  }
-
-  if (status === "unconfigured") {
-    return null;
   }
 
   return (
@@ -37,7 +69,7 @@ export function ClientPushButton() {
       variant="outline"
       size="sm"
       className="w-full"
-      onClick={enable}
+      onClick={() => void enable()}
       disabled={loading || status === "unsupported"}
     >
       {status === "denied" ? (

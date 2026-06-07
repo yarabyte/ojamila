@@ -1,7 +1,8 @@
 import { withAuth } from "next-auth/middleware";
-import { NextResponse } from "next/server";
+import type { NextRequestWithAuth } from "next-auth/middleware";
+import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 
-export default withAuth(
+const authMiddleware = withAuth(
   function middleware(req) {
     const token = req.nextauth.token;
     const path = req.nextUrl.pathname;
@@ -33,6 +34,24 @@ export default withAuth(
   }
 );
 
+export default function middleware(req: NextRequest, event: NextFetchEvent) {
+  if (req.nextUrl.pathname === "/api/auth/signout" && req.method === "GET") {
+    const callbackUrl = req.nextUrl.searchParams.get("callbackUrl") ?? "/login";
+    const url = new URL("/logout", req.url);
+    url.searchParams.set("callbackUrl", callbackUrl);
+    return NextResponse.redirect(url);
+  }
+
+  if (
+    req.nextUrl.pathname.startsWith("/admin") ||
+    req.nextUrl.pathname.startsWith("/staff")
+  ) {
+    return authMiddleware(req as NextRequestWithAuth, event);
+  }
+
+  return NextResponse.next();
+}
+
 export const config = {
-  matcher: ["/admin/:path*", "/staff/:path*"],
+  matcher: ["/admin/:path*", "/staff/:path*", "/api/auth/signout"],
 };

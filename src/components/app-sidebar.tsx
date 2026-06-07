@@ -17,6 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { VENUE_NAME } from "@/lib/venue";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { cn } from "@/lib/utils";
 
 type NavItem = {
@@ -42,6 +43,8 @@ export function AppSidebar({
   clientLoggedIn: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  const [logoutOpen, setLogoutOpen] = useState(false);
+  const [logoutLoading, setLogoutLoading] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -92,7 +95,10 @@ export function AppSidebar({
   }
 
   async function logout() {
+    setLogoutLoading(true);
     await fetch("/api/client/logout", { method: "POST" });
+    setLogoutLoading(false);
+    setLogoutOpen(false);
     setOpen(false);
     router.push("/client");
     router.refresh();
@@ -176,7 +182,7 @@ export function AppSidebar({
               <div className="border-t border-white/10 p-3">
                 <button
                   type="button"
-                  onClick={() => void logout()}
+                  onClick={() => setLogoutOpen(true)}
                   className="flex w-full items-center gap-3 rounded-xl px-4 py-3.5 text-[15px] font-semibold text-white/80 transition-colors hover:bg-white/10"
                 >
                   <LogOut className="h-5 w-5 text-gold" />
@@ -187,6 +193,18 @@ export function AppSidebar({
           </aside>
         </div>
       )}
+
+      <ConfirmDialog
+        open={logoutOpen}
+        title="Déconnexion"
+        description="Vous quitterez votre espace client. Vous pourrez vous reconnecter avec votre numéro WhatsApp."
+        confirmLabel="Confirmer"
+        cancelLabel="Annuler"
+        onConfirm={() => void logout()}
+        onCancel={() => setLogoutOpen(false)}
+        loading={logoutLoading}
+        variant="dark"
+      />
     </>
   );
 }

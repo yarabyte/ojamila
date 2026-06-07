@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { COOKIE_NAME, signClientPhone } from "@/lib/client-session";
 import { AppError } from "@/lib/errors";
 import {
-  pushService,
+  notifyStaffNewSubscription,
   subscriptionService,
   whatsappService,
 } from "@/lib/services";
@@ -53,12 +53,7 @@ export async function subscribeSelfService(
       path: "/",
     });
 
-    const base = process.env.NEXT_PUBLIC_APP_URL ?? "";
-    void pushService.sendToAdmins({
-      title: "Nouvelle souscription",
-      body: `${sub.client.name} — ${sub.formula.name} (${sub.status})`,
-      url: `${base}/admin/subscriptions/${sub.id}`,
-    });
+    void notifyStaffNewSubscription(sub);
 
     revalidatePath("/");
     return { success: true, data: { subscriptionId: sub.id } };

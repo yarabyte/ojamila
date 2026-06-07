@@ -1,6 +1,41 @@
 "use client";
 
-export async function subscribeToPush(): Promise<"ok" | "unsupported" | "denied" | "unconfigured"> {
+const PUSH_ENABLED_KEY = "jamila-push-enabled";
+
+export type PushSubscribeResult =
+  | "ok"
+  | "unsupported"
+  | "denied"
+  | "unconfigured";
+
+export async function getPushStatus(): Promise<{
+  configured: boolean;
+  subscribed: boolean;
+  browserGranted: boolean;
+}> {
+  const browserGranted =
+    typeof Notification !== "undefined" && Notification.permission === "granted";
+
+  try {
+    const res = await fetch("/api/push/status");
+    if (!res.ok) {
+      return { configured: false, subscribed: false, browserGranted };
+    }
+    const data = (await res.json()) as {
+      configured: boolean;
+      subscribed: boolean;
+    };
+    return {
+      configured: data.configured,
+      subscribed: data.subscribed,
+      browserGranted,
+    };
+  } catch {
+    return { configured: false, subscribed: false, browserGranted };
+  }
+}
+
+export async function subscribeToPush(): Promise<PushSubscribeResult> {
   if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
     return "unsupported";
   }
@@ -25,7 +60,27 @@ export async function subscribeToPush(): Promise<"ok" | "unsupported" | "denied"
   });
 
   if (!res.ok) return "denied";
+
+  try {
+    localStorage.setItem(PUSH_ENABLED_KEY, "1");
+  } catch {
+    /* ignore */
+  }
+
   return "ok";
+}
+
+export function isPushLikelyEnabled(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return (
+      localStorage.getItem(PUSH_ENABLED_KEY) === "1" &&
+      typeof Notification !== "undefined" &&
+      Notification.permission === "granted"
+    );
+  } catch {
+    return false;
+  }
 }
 
 function urlBase64ToUint8Array(base64String: string) {

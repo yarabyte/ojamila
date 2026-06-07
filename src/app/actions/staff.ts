@@ -4,8 +4,10 @@ import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/auth";
 import { AppError } from "@/lib/errors";
 import { formatActionError } from "@/lib/format-action-error";
+import { SubscriptionStatus } from "@prisma/client";
 import {
-  pushService,
+  notifyClientWaitlistPromotion,
+  notifyStaffNewSubscription,
   subscriptionService,
   whatsappService,
 } from "@/lib/services";
@@ -40,6 +42,10 @@ export async function subscribeAtCounter(
       parsed.data,
       session.user.id
     );
+
+    if (sub.status === SubscriptionStatus.WAITLIST) {
+      void notifyStaffNewSubscription(sub);
+    }
 
     revalidatePath("/staff");
     revalidatePath("/admin");
@@ -77,12 +83,7 @@ export async function promoteWaitlist(
   try {
     await requireRole(["STAFF", "ADMIN"]);
     const sub = await subscriptionService.promoteFromWaitlist(subscriptionId);
-    const base = process.env.NEXT_PUBLIC_APP_URL ?? "";
-    void pushService.sendToUser(sub.clientId, {
-      title: "Place disponible — JAMILA",
-      body: `Bonjour ${sub.client.name}, une place s'est libérée pour ${sub.formula.name}. Présentez-vous à la caisse.`,
-      url: `${base}/subscribe/confirmation/${sub.id}`,
-    });
+    void notifyClientWaitlistPromotion(sub);
     const qrLink = getSubscriptionQrUrl(sub.id);
     const message = await whatsappService.buildMessage({
       name: sub.client.name,
