@@ -46,7 +46,7 @@ export function ClientPushButton() {
   async function enable() {
     setLoading(true);
     const result = await subscribeToPush();
-    setStatus(result === "ok" ? "ok" : result);
+    setStatus(result === "ok" ? "ok" : result === "error" ? "ready" : result);
     setLoading(false);
   }
 

@@ -7,6 +7,7 @@ const nextConfig = {
       "jose",
       "next-auth",
       "zod",
+      "web-push",
     ],
   },
   async headers() {

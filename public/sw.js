@@ -1,4 +1,4 @@
-const CACHE = "jamila-v6";
+const CACHE = "jamila-v7";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(self.skipWaiting());

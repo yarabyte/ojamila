@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-const SW_URL = "/sw.js?v=6";
+const SW_URL = "/sw.js?v=7";
 
 export function PwaRegister() {
   useEffect(() => {

@@ -7,10 +7,14 @@ export type PushPayload = {
   url?: string;
 };
 
+function stripEnv(value: string | undefined): string | undefined {
+  return value?.replace(/^["']|["']$/g, "").trim();
+}
+
 function ensureVapid() {
-  const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-  const privateKey = process.env.VAPID_PRIVATE_KEY;
-  const subject = process.env.VAPID_SUBJECT ?? "mailto:admin@ojamila.cm";
+  const publicKey = stripEnv(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY);
+  const privateKey = stripEnv(process.env.VAPID_PRIVATE_KEY);
+  const subject = stripEnv(process.env.VAPID_SUBJECT) ?? "mailto:admin@ojamila.cm";
 
   if (!publicKey || !privateKey) {
     return false;
@@ -21,7 +25,7 @@ function ensureVapid() {
 }
 
 export function getVapidPublicKey(): string | null {
-  return process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null;
+  return stripEnv(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY) ?? null;
 }
 
 export class PushService {

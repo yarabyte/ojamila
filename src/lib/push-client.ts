@@ -1,12 +1,14 @@
 "use client";
 
 const PUSH_ENABLED_KEY = "jamila-push-enabled";
+const SW_URL = "/sw.js?v=7";
 
 export type PushSubscribeResult =
   | "ok"
   | "unsupported"
   | "denied"
-  | "unconfigured";
+  | "unconfigured"
+  | "error";
 
 export async function getPushStatus(): Promise<{
   configured: boolean;
@@ -35,6 +37,15 @@ export async function getPushStatus(): Promise<{
   }
 }
 
+async function ensureServiceWorker(): Promise<ServiceWorkerRegistration> {
+  let registration = await navigator.serviceWorker.getRegistration("/");
+  if (!registration) {
+    registration = await navigator.serviceWorker.register(SW_URL);
+  }
+  await navigator.serviceWorker.ready;
+  return registration;
+}
+
 export async function subscribeToPush(): Promise<PushSubscribeResult> {
   if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
     return "unsupported";
@@ -44,30 +55,37 @@ export async function subscribeToPush(): Promise<PushSubscribeResult> {
   if (permission !== "granted") return "denied";
 
   const vapidRes = await fetch("/api/push/vapid-public-key");
-  const { publicKey } = await vapidRes.json();
+  if (!vapidRes.ok) return "unconfigured";
+  const { publicKey } = (await vapidRes.json()) as { publicKey?: string };
   if (!publicKey) return "unconfigured";
 
-  const registration = await navigator.serviceWorker.ready;
-  const subscription = await registration.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: urlBase64ToUint8Array(publicKey),
-  });
-
-  const res = await fetch("/api/push/subscribe", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(subscription.toJSON()),
-  });
-
-  if (!res.ok) return "denied";
-
   try {
-    localStorage.setItem(PUSH_ENABLED_KEY, "1");
-  } catch {
-    /* ignore */
-  }
+    const registration = await ensureServiceWorker();
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicKey),
+    });
 
-  return "ok";
+    const res = await fetch("/api/push/subscribe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(subscription.toJSON()),
+    });
+
+    if (res.status === 503) return "unconfigured";
+    if (res.status === 401) return "denied";
+    if (!res.ok) return "error";
+
+    try {
+      localStorage.setItem(PUSH_ENABLED_KEY, "1");
+    } catch {
+      /* ignore */
+    }
+
+    return "ok";
+  } catch {
+    return "error";
+  }
 }
 
 export function isPushLikelyEnabled(): boolean {
